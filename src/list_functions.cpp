@@ -2,10 +2,11 @@
 
 int ListPushTail(List* list, elem_t value) {
 
-    if (list->size >= list->capacity - 1) {
-        printf("Can't push elem after tail\n");
-        return -1;
-    }
+    // if (list->size >= list->capacity - 1) {
+    //     printf("Can't push elem after tail\n");
+    //     return -1;
+    // }
+    Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
 
     int new_tail_id = list->free_cell;
     list->data[new_tail_id].number = value;  
@@ -13,13 +14,13 @@ int ListPushTail(List* list, elem_t value) {
 
     if (list->size == ListInitSize) {
         list->head = new_tail_id;
-        // list->data[list->head].next = new_tail_id;
     }
 
     list->data[list->tail].next = new_tail_id; 
     list->tail      = new_tail_id;
 
-    list->free_cell = list->data[list->free_cell].next;
+    FindFreeCell();
+    
     list->data[list->tail].next = 0;
 
     list->size ++;
@@ -28,10 +29,11 @@ int ListPushTail(List* list, elem_t value) {
 
 int ListPushHead(List* list, elem_t value) {
 
-    if (list->size >= list->capacity - 1) {
-        printf("Can't push elem before head\n");
-        return -1;
-    }
+    // if (list->size >= list->capacity - 1) {
+    //     printf("Can't push elem before head\n");
+    //     return -1;
+    // }
+    Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
 
     int new_head_id = list->free_cell;
 
@@ -45,7 +47,7 @@ int ListPushHead(List* list, elem_t value) {
 
     list->data[list->head].prev = list->free_cell; 
 
-    list->free_cell = list->data[list->free_cell].next;
+    FindFreeCell();
 
     list->data[new_head_id].next = list->head; 
     list->head                   = new_head_id;
@@ -66,21 +68,50 @@ int ListPushRight(List* list, int cell_id, elem_t value) {
         return value;
     }
 
-    int new_elem_id   = list->free_cell;
-    int after_cell_id = list->data[cell_id].next;
+    int new_elem_id       = list->free_cell;
+    int cell_id_neighbour = list->data[cell_id].next;
 
     list->data[new_elem_id].number = value;
 
-    list->data[new_elem_id].next   = after_cell_id;
-    list->data[after_cell_id].prev = new_elem_id;
-    list->data[cell_id].next       = new_elem_id;
-    list->data[new_elem_id].prev   = cell_id;
+    FindFreeCell();
+
+    list->data[new_elem_id].next       = cell_id_neighbour;
+    list->data[cell_id_neighbour].prev = new_elem_id;
+    list->data[cell_id].next           = new_elem_id;
+    list->data[new_elem_id].prev       = cell_id;
     
+
     list->size ++;
-    
+
     return value;
 }
 
+int ListPushLeft(List* list, int cell_id, elem_t value) {
+
+    if (cell_id < 0 || cell_id >= list->capacity) {
+        printf("err\n");
+    }
+
+    if (list->size == ListInitSize || cell_id == list->head) {
+        ListPushHead(list, value);
+        return value;
+    }
+
+    int new_elem_id       = list->free_cell;
+    int cell_id_neighbour = list->data[cell_id].prev;
+    list->data[new_elem_id].number = value;
+
+    FindFreeCell();
+
+    list->data[new_elem_id].next       = cell_id;
+    list->data[cell_id_neighbour].next = new_elem_id;
+    list->data[cell_id].prev           = new_elem_id;
+    list->data[new_elem_id].prev       = cell_id_neighbour;
+    
+    list->size ++;
+
+    return value;
+}
 
 
 void ListCtor(List* list, int capacity, int line, const char* func, const char* file) {
@@ -88,7 +119,7 @@ void ListCtor(List* list, int capacity, int line, const char* func, const char* 
     list->capacity = capacity;
 
     list->data = (node*) calloc(capacity, sizeof(node));
-    Validator(list->data == nullptr, "in calloc: couldn't give memory", PrintFuncPosition(); exit(EXIT_FAILURE));
+    Validator(list->data == nullptr, "in calloc: couldn't give memory", PrintFuncPosition(); exit(EXIT_FAILURE););
 
     list->data[0].prev   = Null_Elem;
     list->data[0].number = 0;
@@ -112,17 +143,28 @@ void ListCtor(List* list, int capacity, int line, const char* func, const char* 
 
 void ListDtor(List* list, int line, const char* func, const char* file) {
     
+    list->tail = 0;
+    list->size = 0;
+
+    for (int node_number = 1; node_number < list->capacity; node_number++) {
+        list->data[node_number].prev   = 0;
+        list->data[node_number].number = 0;
+        list->data[node_number].next   = 0;
+    }
+    list->capacity = 0;
+
     free(list->data);
     list -> data = nullptr;
 }
 
 void PrintElementInfo(List* list, int elem_id) {
 
-    if (elem_id < 0 || elem_id >= list->capacity) {
-        fprintf(stderr, "" Red "error: " Grey " there is not element with such index"
-        " in the list\n");
-        return ;
-    }
+    // if (elem_id < 0 || elem_id >= list->capacity) {
+    //     fprintf(stderr, "" Red "error: " Grey " there is not element with such index in the list\n");
+    //     return ;
+    // }
+    Validator((elem_id < 0 || elem_id >= list->capacity), "invalid elem index"; PrintFuncPosition();  return ;);
+
     fprintf(stderr, "\t\t" Purple Blinking "Element Dump" Grin "\n");
     fprintf(stderr, "prev index: %d\n", list->data[elem_id].prev);
     fprintf(stderr, "index:      %d\n", elem_id);
@@ -131,10 +173,10 @@ void PrintElementInfo(List* list, int elem_id) {
 }
 
 void ListInform(List* list, int line, const char* func, const char* file) {
-    
-    fprintf(stderr, "\n" Blue "------------------------------------------" Blinking "List Dump" Blue "------------------------------"
-    "------------" Grey "\n");
+
+    PrintListDump();
     PrintFuncPosition();
+
     fprintf(stderr, "\n");
     fprintf(stderr, "list data ptr    =  %p\n", list->data);
     fprintf(stderr, "list head        =  %d\n", list->head);
@@ -143,21 +185,23 @@ void ListInform(List* list, int line, const char* func, const char* file) {
     fprintf(stderr, "list size        =  %d\n", list->size);
     fprintf(stderr, "list free cell   =  %d\n\n", list->free_cell);
 
-    fprintf(stderr, "list elemenst in order:\n");
-    // int data_num = 1;
-    // int elem_id  = list->head;
-    
-    // for ( ; data_num < list->size; data_num++, elem_id = list->data[elem_id].next) {
-    //     fprintf(stderr, "[%d] = %lg\n", data_num, list->data[elem_id].number);
-    // }
-    // fprintf(stderr, "*[%d] = %lg <------ End of list\n", data_num, list->data[elem_id].number);
-    // fprintf(stderr, "" Blue "---------------------------------------------------------------------------------------------" Grey "\n\n");
+    fprintf(stderr, "list elemenst from 'head' to 'tail' in order:\n");
     int data_num = 1;
-    int elem_id  = list->tail;
+    int elem_id  = list->head;
+
+    fprintf(stderr, "" Blue "---------------------------------------------------------------------------------------------" Grey "\n");
+    for ( ; data_num < list->size; data_num++, elem_id = list->data[elem_id].next) {
+        fprintf(stderr, "[%d] = %lg\n", data_num, list->data[elem_id].number);
+    }
+    fprintf(stderr, "*[%d] = %lg <------ End of list\n", data_num, list->data[elem_id].number);
+    fprintf(stderr, "" Blue "---------------------------------------------------------------------------------------------" Grey "\n");
+    fprintf(stderr, "list elemenst from 'tail' to 'head' in order:\n");
+    data_num = 1;
+    elem_id  = list->tail;
     
     for ( ; data_num < list->size; data_num++, elem_id = list->data[elem_id].prev) {
         fprintf(stderr, "[%d] = %lg\n", data_num, list->data[elem_id].number);
     }
-    fprintf(stderr, "*[%d] = %lg <------ End of list\n", data_num, list->data[elem_id].number);
-    fprintf(stderr, "" Blue "---------------------------------------------------------------------------------------------" Grey "\n\n");
+
+    PrintListDumpEnd();
 }
