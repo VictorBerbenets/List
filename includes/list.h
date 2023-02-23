@@ -9,8 +9,6 @@
 #include "Validator.h"
 #include "defines.h"
 
-
-
 typedef double elem_t;
 const int List_size = 1024;
 
@@ -35,9 +33,10 @@ typedef struct {
 
 enum List_params {
 
-    Null_Elem  =  -0XDEADBABE123,
-    Free_Cell  =  1,
-    Null_Node  =  0,
+    Null_Elem       =  -777,
+    Free_Cell       =  -111,
+    ListInitSize    =  1,
+    Null_Node       =  0,
 };
 
 void ListCtor(List* list, int capacity, int line, const char* func, const char* file);
@@ -45,6 +44,12 @@ void ListCtor(List* list, int capacity, int line, const char* func, const char* 
 void ListDtor(List* list, int line, const char* func, const char* file);
 
 void ListInform(List* list, int line, const char* func, const char* file);
+
+void PrintElementInfo(List* list, int elem_id);
+
+int ListPushTail(List* list, elem_t value);
+
+int ListPushHead(List* list, elem_t value);
 
 int ListPushRight(List* list, int cell_id, elem_t value);
 
