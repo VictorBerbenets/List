@@ -8,7 +8,7 @@ int ListPushTail(List* list, elem_t value) {
     // }
     Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
 
-    int new_tail_id = list->free_cell;
+    int new_tail_id = list->free_node;
     list->data[new_tail_id].number = value;  
     list->data[new_tail_id].prev = list->tail;
 
@@ -19,7 +19,7 @@ int ListPushTail(List* list, elem_t value) {
     list->data[list->tail].next = new_tail_id; 
     list->tail      = new_tail_id;
 
-    FindFreeCell();
+    FindFreeNode();
     
     list->data[list->tail].next = 0;
 
@@ -35,7 +35,7 @@ int ListPushHead(List* list, elem_t value) {
     // }
     Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
 
-    int new_head_id = list->free_cell;
+    int new_head_id = list->free_node;
 
     list->data[new_head_id].number = value;  
     list->data[new_head_id].prev   = 0;
@@ -45,9 +45,9 @@ int ListPushHead(List* list, elem_t value) {
         list->data[list->tail].prev = new_head_id;
     }
 
-    list->data[list->head].prev = list->free_cell; 
+    list->data[list->head].prev = list->free_node; 
 
-    FindFreeCell();
+    FindFreeNode();
 
     list->data[new_head_id].next = list->head; 
     list->head                   = new_head_id;
@@ -57,28 +57,28 @@ int ListPushHead(List* list, elem_t value) {
     return value;
 }
 
-int ListPushRight(List* list, int cell_id, elem_t value) {
+int ListPushRight(List* list, int node_id, elem_t value) {
 
-    if (cell_id < 0 || cell_id >= list->capacity) {
+    if (node_id < 0 || node_id >= list->capacity) {
         printf("err\n");
     }
 
-    if (list->size == ListInitSize || cell_id == list->tail) {
+    if (list->size == ListInitSize || node_id == list->tail) {
         ListPushTail(list, value);
         return value;
     }
 
-    int new_elem_id       = list->free_cell;
-    int cell_id_neighbour = list->data[cell_id].next;
+    int new_elem_id       = list->free_node;
+    int node_id_neighbour = list->data[node_id].next;
 
     list->data[new_elem_id].number = value;
 
-    FindFreeCell();
+    FindFreeNode();
 
-    list->data[new_elem_id].next       = cell_id_neighbour;
-    list->data[cell_id_neighbour].prev = new_elem_id;
-    list->data[cell_id].next           = new_elem_id;
-    list->data[new_elem_id].prev       = cell_id;
+    list->data[new_elem_id].next       = node_id_neighbour;
+    list->data[node_id_neighbour].prev = new_elem_id;
+    list->data[node_id].next           = new_elem_id;
+    list->data[new_elem_id].prev       = node_id;
     
 
     list->size ++;
@@ -86,31 +86,102 @@ int ListPushRight(List* list, int cell_id, elem_t value) {
     return value;
 }
 
-int ListPushLeft(List* list, int cell_id, elem_t value) {
+int ListPushLeft(List* list, int node_id, elem_t value) {
 
-    if (cell_id < 0 || cell_id >= list->capacity) {
+    if (node_id < 0 || node_id >= list->capacity) {
         printf("err\n");
     }
 
-    if (list->size == ListInitSize || cell_id == list->head) {
+    if (list->size == ListInitSize || node_id == list->head) {
         ListPushHead(list, value);
         return value;
     }
 
-    int new_elem_id       = list->free_cell;
-    int cell_id_neighbour = list->data[cell_id].prev;
+    int new_elem_id       = list->free_node;
+    int node_id_neighbour = list->data[node_id].prev;
     list->data[new_elem_id].number = value;
 
-    FindFreeCell();
+    FindFreeNode();
 
-    list->data[new_elem_id].next       = cell_id;
-    list->data[cell_id_neighbour].next = new_elem_id;
-    list->data[cell_id].prev           = new_elem_id;
-    list->data[new_elem_id].prev       = cell_id_neighbour;
+    list->data[new_elem_id].next       = node_id;
+    list->data[node_id_neighbour].next = new_elem_id;
+    list->data[node_id].prev           = new_elem_id;
+    list->data[new_elem_id].prev       = node_id_neighbour;
     
     list->size ++;
 
     return value;
+}
+
+int ListDeleteNode(List* list, int node_id) {
+
+    int node_id_neighbour = 0;
+    if (list->data[node_id].number == Free_Node || list->size == ListInitSize) {
+        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey " can't delete this node");
+    }
+    // Validator(list->data[node_id].number == Free_Node || list->size == ListInitSize, "can't delete this node", PrintFuncPosition(); \
+    return -1;)
+
+    else if (node_id == list->tail) {
+
+        DeleteTail(list, node_id);   
+    }
+
+    else if (node_id == list->head) {
+        
+        DeleteHead(list, node_id);   
+    }
+
+    else {
+        DeleteNode(list, node_id);
+    }
+
+    list->size --;
+    
+}
+
+void DeleteNode(List* list, int node_id) {
+
+    int right_neighbour = list->data[node_id].next;
+    int left_neighbour  = list->data[node_id].prev;
+    list->data[node_id].number = Free_Node;
+
+    AddFreeNodeAfterDelete(list, node_id);
+
+    list->data[right_neighbour].prev = left_neighbour;
+    list->data[left_neighbour].next  = right_neighbour;
+}
+
+void DeleteTail(List* list, int node_id) {
+
+    int node_id_neighbour      = list->data[node_id].prev;
+    list->data[node_id].number = Free_Node;
+
+    AddFreeNodeAfterDelete(list, node_id);
+
+    list->tail = node_id_neighbour;
+    list->data[node_id_neighbour].next = 0;   
+}
+
+void DeleteHead(List* list, int node_id) {
+
+    int node_id_neighbour      = list->data[node_id].next;
+    list->data[node_id].number = Free_Node;
+
+    AddFreeNodeAfterDelete(list, node_id);
+
+    list->head = node_id_neighbour;
+    list->data[node_id_neighbour].prev = 0;   
+}
+
+void AddFreeNodeAfterDelete(List* list, int node_id) {
+
+    int old_free_node = list->free_node;
+
+    list->data[old_free_node].prev = node_id;
+    list->free_node = node_id;
+    list->data[node_id].next = old_free_node;
+    list->data[node_id].prev   = list->data[old_free_node].prev;
 }
 
 
@@ -131,11 +202,11 @@ void ListCtor(List* list, int capacity, int line, const char* func, const char* 
     list->data[Null_Node].next = 0;
     list->data[Null_Node].prev = 0;
 
-    list->free_cell = 1;
+    list->free_node = 1;
 
     for (int node_number = 1; node_number < capacity; node_number++) {
         list->data[node_number].prev   = node_number - 1;
-        list->data[node_number].number = Free_Cell;
+        list->data[node_number].number = Free_Node;
         list->data[node_number].next   = node_number + 1;
     }
 }
@@ -183,7 +254,7 @@ void ListInform(List* list, int line, const char* func, const char* file) {
     fprintf(stderr, "list tail        =  %d\n", list->tail);
     fprintf(stderr, "list capacity    =  %d\n", list->capacity);
     fprintf(stderr, "list size        =  %d\n", list->size);
-    fprintf(stderr, "list free cell   =  %d\n\n", list->free_cell);
+    fprintf(stderr, "list free node   =  %d\n\n", list->free_node);
 
     fprintf(stderr, "list elemenst from 'head' to 'tail' in order:\n");
     int data_num = 1;
@@ -193,6 +264,8 @@ void ListInform(List* list, int line, const char* func, const char* file) {
     for ( ; data_num < list->size; data_num++, elem_id = list->data[elem_id].next) {
         fprintf(stderr, "[%d] = %lg\n", data_num, list->data[elem_id].number);
     }
+        fprintf(stderr, "elem_id = %d\n", elem_id);
+
     fprintf(stderr, "*[%d] = %lg <------ End of list\n", data_num, list->data[elem_id].number);
     fprintf(stderr, "" Blue "---------------------------------------------------------------------------------------------" Grey "\n");
     fprintf(stderr, "list elemenst from 'tail' to 'head' in order:\n");
@@ -202,6 +275,8 @@ void ListInform(List* list, int line, const char* func, const char* file) {
     for ( ; data_num < list->size; data_num++, elem_id = list->data[elem_id].prev) {
         fprintf(stderr, "[%d] = %lg\n", data_num, list->data[elem_id].number);
     }
+        fprintf(stderr, "elem_id = %d\n", elem_id);
 
+    fprintf(stderr, "*[%d] = %lg <------ End of list\n", data_num, list->data[elem_id].number);                    
     PrintListDumpEnd();
 }

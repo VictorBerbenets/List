@@ -27,14 +27,15 @@ typedef struct {
     int size;
     int tail;
     int head;
-    int free_cell;
+    int free_node;
 
 } List;
 
 enum List_params {
 
+    Poison          = 0xDEADFEED,
     Null_Elem       =  -777,
-    Free_Cell       =  -111,
+    Free_Node       =  -0xDEADFEED,
     ListInitSize    =  1,
     Null_Node       =  0,
 };
@@ -55,6 +56,15 @@ int ListPushRight(List* list, int cell_id, elem_t value);
 
 int ListPushLeft(List* list, int cell_id, elem_t value);
 
+int ListDeleteNode(List* list, int cell_id);
+
+void DeleteNode(List* list, int node_id);
+
+void DeleteTail(List* list, int cell_id);
+
+void DeleteHead(List* list, int cell_id);
+
+void AddFreeNodeAfterDelete(List* list, int cell_id);
 
 
 
