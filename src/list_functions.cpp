@@ -2,10 +2,10 @@
 
 int ListPushTail(List* list, elem_t value) {
 
-    // if (list->size >= list->capacity - 1) {
-    //     printf("Can't push elem after tail\n");
-    //     return -1;
-    // }
+    if (list->size >= list->capacity - 1) {
+        printf("Can't push elem after tail\n");
+        return InvalidNodeId;
+    }
     Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
 
     int new_tail_id = list->free_node;
@@ -24,15 +24,16 @@ int ListPushTail(List* list, elem_t value) {
     list->data[list->tail].next = 0;
 
     list->size ++;
+
     return value;
 }
 
 int ListPushHead(List* list, elem_t value) {
 
-    // if (list->size >= list->capacity - 1) {
-    //     printf("Can't push elem before head\n");
-    //     return -1;
-    // }
+    if (list->size >= list->capacity - 1) {
+        printf("Can't push elem before head\n");
+        return InvalidNodeId;
+    }
     Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
 
     int new_head_id = list->free_node;
@@ -42,7 +43,7 @@ int ListPushHead(List* list, elem_t value) {
 
     if (list->size == ListInitSize) {
         list->tail = new_head_id;
-        list->data[list->tail].prev = new_head_id;
+        // list->data[list->tail].prev = new_head_id;
     }
 
     list->data[list->head].prev = list->free_node; 
@@ -53,6 +54,7 @@ int ListPushHead(List* list, elem_t value) {
     list->head                   = new_head_id;
         
     list->size ++;
+    list->list_is_linear = false;
 
     return value;
 }
@@ -61,6 +63,7 @@ int ListPushRight(List* list, int node_id, elem_t value) {
 
     if (node_id < 0 || node_id >= list->capacity) {
         printf("err\n");
+        return InvalidNodeId;
     }
 
     if (list->size == ListInitSize || node_id == list->tail) {
@@ -80,8 +83,8 @@ int ListPushRight(List* list, int node_id, elem_t value) {
     list->data[node_id].next           = new_elem_id;
     list->data[new_elem_id].prev       = node_id;
     
-
     list->size ++;
+    list->list_is_linear = false;
 
     return value;
 }
@@ -90,6 +93,7 @@ int ListPushLeft(List* list, int node_id, elem_t value) {
 
     if (node_id < 0 || node_id >= list->capacity) {
         printf("err\n");
+        return InvalidNodeId;
     }
 
     if (list->size == ListInitSize || node_id == list->head) {
@@ -118,10 +122,17 @@ int ListDeleteNode(List* list, int node_id) {
     int node_id_neighbour = 0;
     if (list->data[node_id].number == Free_Node || list->size == ListInitSize) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey " can't delete this node");
+        return InvalidNodeId;
+
     }
     // Validator(list->data[node_id].number == Free_Node || list->size == ListInitSize, "can't delete this node", PrintFuncPosition(); \
     return -1;)
-
+    if (list->size == ListInitSize + 1) {
+        list->tail = 0;
+        list->head = 0;
+        // list->free_node = 1;
+        // list-
+    }
     else if (node_id == list->tail) {
 
         DeleteTail(list, node_id);   
@@ -184,6 +195,31 @@ void AddFreeNodeAfterDelete(List* list, int node_id) {
     list->data[node_id].prev   = list->data[old_free_node].prev;
 }
 
+List ListLinerize(List* list) {
+
+    node* new_data = (node*) calloc(list->capacity, sizeof(node));
+
+    int list_ptr     = list->head;
+    int node_counter = 0;
+
+    new_data[node_counter].prev   = 0;
+    new_data[node_counter].number = 0;
+    new_data[node_counter].next   = 0;
+
+    for (node_counter = 1; node_counter < list->capacity; node_counter++, list_ptr = list->data[list_ptr].next) {
+
+        new_data[node_counter].prev   = node_counter - 1;
+        new_data[node_counter].number = list->data[list_ptr].number;
+        new_data[node_counter].next   = node_counter + 1;
+    }
+
+    list->free_node = node_counter;
+
+    free(list->data);
+    list->data = new_data;
+
+    return *list;
+}
 
 void ListCtor(List* list, int capacity, int line, const char* func, const char* file) {
 
@@ -209,6 +245,8 @@ void ListCtor(List* list, int capacity, int line, const char* func, const char* 
         list->data[node_number].number = Free_Node;
         list->data[node_number].next   = node_number + 1;
     }
+
+    list->list_is_linear = true;
 }
 
 
@@ -230,10 +268,10 @@ void ListDtor(List* list, int line, const char* func, const char* file) {
 
 void PrintElementInfo(List* list, int elem_id) {
 
-    // if (elem_id < 0 || elem_id >= list->capacity) {
-    //     fprintf(stderr, "" Red "error: " Grey " there is not element with such index in the list\n");
-    //     return ;
-    // }
+    if (elem_id < 0 || elem_id >= list->capacity) {
+        fprintf(stderr, "" Red "error: " Grey " there is not element with such index in the list\n");
+        return ;
+    }
     Validator((elem_id < 0 || elem_id >= list->capacity), "invalid elem index"; PrintFuncPosition();  return ;);
 
     fprintf(stderr, "\t\t" Purple Blinking "Element Dump" Grin "\n");

@@ -28,17 +28,22 @@ typedef struct {
     int tail;
     int head;
     int free_node;
+    int list_is_linear;
 
 } List;
 
 enum List_params {
 
-    Poison          = 0xDEADFEED,
-    Null_Elem       =  -777,
     Free_Node       =  -0xDEADFEED,
+    Null_Elem       =  -777,
     ListInitSize    =  1,
     Null_Node       =  0,
 };
+
+enum ListErrors {
+
+    InvalidNodeId = 100,
+} ;
 
 void ListCtor(List* list, int capacity, int line, const char* func, const char* file);
 
@@ -66,6 +71,9 @@ void DeleteHead(List* list, int cell_id);
 
 void AddFreeNodeAfterDelete(List* list, int cell_id);
 
+List ListResize(List* list, int new_capacity);
+
+List ListLinerize(List* list);
 
 
 #endif
