@@ -67,8 +67,8 @@ int ListPushRight(List* list, int node_id, elem_t value) {
     }
 
     if (list->size == ListInitSize || node_id == list->tail) {
-        ListPushTail(list, value);
-        return value;
+        
+        return ListPushTail(list, value);
     }
 
     int new_elem_id       = list->free_node;
@@ -97,8 +97,8 @@ int ListPushLeft(List* list, int node_id, elem_t value) {
     }
 
     if (list->size == ListInitSize || node_id == list->head) {
-        ListPushHead(list, value);
-        return value;
+        
+        return ListPushHead(list, value);
     }
 
     int new_elem_id       = list->free_node;
@@ -121,9 +121,8 @@ int ListDeleteNode(List* list, int node_id) {
 
     int node_id_neighbour = 0;
     if (list->data[node_id].number == Free_Node || list->size == ListInitSize) {
-        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey " can't delete this node");
+        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey " can't delete this node\n", __PRETTY_FUNCTION__, __LINE__);
         return InvalidNodeId;
-
     }
     // Validator(list->data[node_id].number == Free_Node || list->size == ListInitSize, "can't delete this node", PrintFuncPosition(); \
     return -1;)
@@ -148,7 +147,8 @@ int ListDeleteNode(List* list, int node_id) {
     }
 
     list->size --;
-    
+
+    return node_id;
 }
 
 void DeleteNode(List* list, int node_id) {
@@ -200,6 +200,8 @@ List ListLinerize(List* list) {
     node* new_data = (node*) calloc(list->capacity, sizeof(node));
 
     int list_ptr     = list->head;
+    list->head       = 1;
+    list->tail       = list->size - 1;
     int node_counter = 0;
 
     new_data[node_counter].prev   = 0;
@@ -213,12 +215,21 @@ List ListLinerize(List* list) {
         new_data[node_counter].next   = node_counter + 1;
     }
 
-    list->free_node = node_counter;
+    new_data[node_counter - 1].next = node_counter - 1; // last free points to itself
+
+    list->free_node = list->size;
+    list->data[list->free_node].next = list->size + 1;
 
     free(list->data);
     list->data = new_data;
 
     return *list;
+}
+
+List ListResize(List* list, int new_capacity) {
+
+
+
 }
 
 void ListCtor(List* list, int capacity, int line, const char* func, const char* file) {
@@ -295,25 +306,26 @@ void ListInform(List* list, int line, const char* func, const char* file) {
     fprintf(stderr, "list free node   =  %d\n\n", list->free_node);
 
     fprintf(stderr, "list elemenst from 'head' to 'tail' in order:\n");
+    PrintBlueLine()
+
     int data_num = 1;
     int elem_id  = list->head;
 
-    fprintf(stderr, "" Blue "---------------------------------------------------------------------------------------------" Grey "\n");
     for ( ; data_num < list->size; data_num++, elem_id = list->data[elem_id].next) {
         fprintf(stderr, "[%d] = %lg\n", data_num, list->data[elem_id].number);
     }
-        fprintf(stderr, "elem_id = %d\n", elem_id);
 
     fprintf(stderr, "*[%d] = %lg <------ End of list\n", data_num, list->data[elem_id].number);
-    fprintf(stderr, "" Blue "---------------------------------------------------------------------------------------------" Grey "\n");
+    PrintBlueLine()
+
     fprintf(stderr, "list elemenst from 'tail' to 'head' in order:\n");
+
     data_num = 1;
     elem_id  = list->tail;
     
     for ( ; data_num < list->size; data_num++, elem_id = list->data[elem_id].prev) {
         fprintf(stderr, "[%d] = %lg\n", data_num, list->data[elem_id].number);
     }
-        fprintf(stderr, "elem_id = %d\n", elem_id);
 
     fprintf(stderr, "*[%d] = %lg <------ End of list\n", data_num, list->data[elem_id].number);                    
     PrintListDumpEnd();
