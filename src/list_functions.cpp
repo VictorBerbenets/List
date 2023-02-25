@@ -61,7 +61,12 @@ int ListPushHead(List* list, elem_t value) {
 
 int ListPushRight(List* list, int node_id, elem_t value) {
 
-    if (node_id < 0 || node_id >= list->capacity) {
+    // if (node_id < 0 || node_id >= list->capacity) {
+    //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
+    //     return InvalidNodeId;
+    // }
+    if (list->data[node_id].number == Free_Node || list->size >= list->capacity) {
+
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
         return InvalidNodeId;
     }
@@ -91,7 +96,12 @@ int ListPushRight(List* list, int node_id, elem_t value) {
 
 int ListPushLeft(List* list, int node_id, elem_t value) {
 
-    if (node_id <= 0 || node_id >= list->capacity) {
+    // if (node_id <= 0 || node_id >= list->capacity) {
+    //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
+    //     return InvalidNodeId;
+    // }
+    if (list->data[node_id].number == Free_Node || list->size >= list->capacity) {
+
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
         return InvalidNodeId;
     }
@@ -101,20 +111,9 @@ int ListPushLeft(List* list, int node_id, elem_t value) {
         return ListPushHead(list, value);
     }
 
-    // int new_elem_id       = list->free_node;
-    // int node_id_neighbour = list->data[node_id].prev;
-    // list->data[new_elem_id].number = value;
+    int left_neighbour = list->data[node_id].prev;
 
-    // FindFreeNode();
-
-    // list->data[new_elem_id].next       = node_id;
-    // list->data[node_id_neighbour].next = new_elem_id;
-    // list->data[node_id].prev           = new_elem_id;
-    // list->data[new_elem_id].prev       = node_id_neighbour;
-    
-    // list->size ++;
-
-    return ListPushRight(list, node_id - 1, value);
+    return ListPushRight(list, left_neighbour, value);
 }
 
 int ListDeleteNode(List* list, int node_id) {
@@ -207,14 +206,18 @@ List ListLinerize(List* list) {
     new_data[node_counter].number = 0;
     new_data[node_counter].next   = 0;
 
-    for (node_counter = 1; node_counter < list->capacity; node_counter++, list_ptr = list->data[list_ptr].next) {
-
+    for (node_counter = 1; node_counter < list->size; node_counter++, list_ptr = list->data[list_ptr].next) {
         new_data[node_counter].prev   = node_counter - 1;
         new_data[node_counter].number = list->data[list_ptr].number;
         new_data[node_counter].next   = node_counter + 1;
     }
-    new_data[list->tail].next = 0;
+    for (node_counter = list->size; node_counter < list->capacity; node_counter++) {
+        new_data[node_counter].prev   = node_counter - 1;
+        new_data[node_counter].number = Free_Node;
+        new_data[node_counter].next   = node_counter + 1;
+    }
 
+    new_data[list->tail].next = 0;                      //tail.next points to null element
     new_data[node_counter - 1].next = node_counter - 1; // last free_node points to itself
 
     list->free_node = list->size;
@@ -222,6 +225,8 @@ List ListLinerize(List* list) {
 
     free(list->data);
     list->data = new_data;
+
+    list->list_is_linear = true;
 
     return *list;
 }
