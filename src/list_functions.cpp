@@ -66,11 +66,11 @@ int ListPushRight(List* list, int node_id, elem_t value) {
     //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
     //     return InvalidNodeId;
     // }
-    if (list->data[node_id].number == Free_Node || list->size >= list->capacity) {
+    // if (list->data[node_id].number == Free_Node || list->size >= list->capacity) {
 
-        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
-        return InvalidNodeId;
-    }
+    //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
+    //     return InvalidNodeId;
+    // }
 
     if (list->size == ListInitSize || node_id == list->tail) {
         
@@ -101,11 +101,11 @@ int ListPushLeft(List* list, int node_id, elem_t value) {
     //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
     //     return InvalidNodeId;
     // }
-    if (list->data[node_id].number == Free_Node || list->size >= list->capacity) {
+    // if (list->data[node_id].number == Free_Node || list->size >= list->capacity) {
 
-        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
-        return InvalidNodeId;
-    }
+    //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
+    //     return InvalidNodeId;
+    // }
 
     if (list->size == ListInitSize || node_id == list->head) {
         
@@ -119,9 +119,23 @@ int ListPushLeft(List* list, int node_id, elem_t value) {
 // Find for logic index
 // Find first elem по значению
 // find physical addres on logic and reverse
+int FindFirstListElem(List* list, elem_t value) {
+
+    int node_id = list->head;
+    for (int node_counter = 1; node_counter < list->size; node_counter++, node_id = list->data[node_id].next) {
+
+        if (list->data[node_id].number == value) {
+            return node_id;
+        }
+    }
+
+    return -1;
+}
+
 int FindPhysAddress(List* list, int logic_id) {
-    if (logic_id) {
-        return ;
+    
+    if (list->size == ListInitSize || logic_id <= 0 || logic_id > list->size) {
+        return InvalidLogicId;
     }
 
     int current_node_id = list->head;
@@ -134,19 +148,15 @@ int FindPhysAddress(List* list, int logic_id) {
 }
 
 int FindLogicAddress(List* list, int phys_id) {
-    if (phys_id) {
-        return ;
-    }
 
+    if (list->size == ListInitSize || phys_id <= 0 || phys_id >= list->capacity) {
+        return InvalidLogicId;
+    }
     int current_node_id = list->head;
     int node_counter = 1;
-    for ( ; current_node_id != phys_id; node_counter++) {
+    for ( ; current_node_id != phys_id && node_counter != list->size; node_counter++) {
 
         current_node_id = list->data[current_node_id].next;
-
-        if(node_counter == list->size) {
-            break;
-        }
     }
 
     return node_counter;
@@ -155,14 +165,14 @@ int FindLogicAddress(List* list, int phys_id) {
 int ListDeleteNode(List* list, int node_id) {
 
     int node_id_neighbour = 0;
-    if (list->data[node_id].number == Free_Node || list->size == ListInitSize) {
+    if (list->size <= 1 || list->size > list->capacity - 1) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey " can't delete this node\n", __PRETTY_FUNCTION__, __LINE__);
         return InvalidNodeId;
     }
     // Validator(list->data[node_id].number == Free_Node || list->size == ListInitSize, "can't delete this node", PrintFuncPosition(); \
     return -1;)
     if (list->size == ListInitSize + 1) { //check that
-
+        printf("AAAAAAAAAAAAAAAAAAAAAAA\n");
         ClearList(list);
     }
     else if (node_id == list->tail) {
@@ -184,6 +194,8 @@ int ListDeleteNode(List* list, int node_id) {
 
 void ClearList(List* list) {
 
+    list->data[list->tail].number = Free_Node;
+    list->data[list->head].number = Free_Node;
     list->tail = 0;
     list->head = 0;
     list->data[1].next   = list->free_node;

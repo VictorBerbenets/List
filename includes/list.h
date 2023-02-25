@@ -43,7 +43,8 @@ enum List_params {
 
 enum ListErrors {
 
-    InvalidNodeId = 100,
+    InvalidLogicId = -101,
+    InvalidNodeId  = 100,
     MemoryGetError,
 } ;
 
@@ -62,6 +63,12 @@ int ListPushHead(List* list, elem_t value);
 int ListPushRight(List* list, int cell_id, elem_t value);
 
 int ListPushLeft(List* list, int cell_id, elem_t value);
+
+int FindLogicAddress(List* list, int phys_id);
+
+int FindPhysAddress(List* list, int logic_id);
+
+int FindFirstListElem(List* list, elem_t value);
 
 int ListDeleteNode(List* list, int cell_id);
 
