@@ -2,8 +2,8 @@
 
 int ListPushTail(List* list, elem_t value) {
 
-    if (list->size >= list->capacity - 1) {
-        printf("Can't push elem after tail\n");
+    if (list->size >= list->capacity) {
+        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid list size for push: %d\n", __PRETTY_FUNCTION__, __LINE__, list->size);
         return InvalidNodeId;
     }
     Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
@@ -17,7 +17,7 @@ int ListPushTail(List* list, elem_t value) {
     }
 
     list->data[list->tail].next = new_tail_id; 
-    list->tail      = new_tail_id;
+    list->tail = new_tail_id;
 
     FindFreeNode();
     
@@ -30,11 +30,11 @@ int ListPushTail(List* list, elem_t value) {
 
 int ListPushHead(List* list, elem_t value) {
 
-    if (list->size >= list->capacity - 1) {
-        printf("Can't push elem before head\n");
+    if (list->size >= list->capacity) {
+        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid list size for push: %d\n", __PRETTY_FUNCTION__, __LINE__, list->size);
         return InvalidNodeId;
     }
-    Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
+    // Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
 
     int new_head_id = list->free_node;
 
@@ -62,7 +62,7 @@ int ListPushHead(List* list, elem_t value) {
 int ListPushRight(List* list, int node_id, elem_t value) {
 
     if (node_id < 0 || node_id >= list->capacity) {
-        printf("err\n");
+        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
         return InvalidNodeId;
     }
 
@@ -92,7 +92,7 @@ int ListPushRight(List* list, int node_id, elem_t value) {
 int ListPushLeft(List* list, int node_id, elem_t value) {
 
     if (node_id < 0 || node_id >= list->capacity) {
-        printf("err\n");
+        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
         return InvalidNodeId;
     }
 
@@ -129,19 +129,17 @@ int ListDeleteNode(List* list, int node_id) {
     if (list->size == ListInitSize + 1) {
         list->tail = 0;
         list->head = 0;
-        // list->free_node = 1;
-        // list-
+        list->data[1].next = list->free_node;
+        list->free_node = 1;
     }
     else if (node_id == list->tail) {
 
         DeleteTail(list, node_id);   
     }
-
     else if (node_id == list->head) {
         
         DeleteHead(list, node_id);   
     }
-
     else {
         DeleteNode(list, node_id);
     }
@@ -192,12 +190,13 @@ void AddFreeNodeAfterDelete(List* list, int node_id) {
     list->data[old_free_node].prev = node_id;
     list->free_node = node_id;
     list->data[node_id].next = old_free_node;
-    list->data[node_id].prev   = list->data[old_free_node].prev;
+    list->data[node_id].prev = list->data[old_free_node].prev;
 }
 
 List ListLinerize(List* list) {
 
     node* new_data = (node*) calloc(list->capacity, sizeof(node));
+    // Validator(new_data == nullptr, "calloc could't give memory", PrintFuncPosition(););
 
     int list_ptr     = list->head;
     list->head       = 1;
@@ -214,8 +213,9 @@ List ListLinerize(List* list) {
         new_data[node_counter].number = list->data[list_ptr].number;
         new_data[node_counter].next   = node_counter + 1;
     }
+    new_data[list->tail].next = 0;
 
-    new_data[node_counter - 1].next = node_counter - 1; // last free points to itself
+    new_data[node_counter - 1].next = node_counter - 1; // last free_node points to itself
 
     list->free_node = list->size;
     list->data[list->free_node].next = list->size + 1;

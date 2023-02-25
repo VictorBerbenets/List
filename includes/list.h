@@ -43,6 +43,7 @@ enum List_params {
 enum ListErrors {
 
     InvalidNodeId = 100,
+    MemoryGetError,
 } ;
 
 void ListCtor(List* list, int capacity, int line, const char* func, const char* file);
