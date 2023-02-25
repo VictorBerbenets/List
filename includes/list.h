@@ -77,5 +77,6 @@ List ListResize(List* list, int new_capacity);
 
 int ListLinerize(List* list);
 
+void ClearList(List* list);
 
 #endif

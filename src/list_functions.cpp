@@ -1,12 +1,14 @@
 #include "..//includes//list.h"
 
+// graphviz
+
 int ListPushTail(List* list, elem_t value) {
 
-    if (list->size >= list->capacity) {
-        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid list size for push: %d\n", __PRETTY_FUNCTION__, __LINE__, list->size);
-        return InvalidNodeId;
-    }
-    Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
+    // if (list->size >= list->capacity) {
+    //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid list size for push: %d\n", __PRETTY_FUNCTION__, __LINE__, list->size);
+    //     return InvalidNodeId;
+    // } //call resize
+    Validator((list->size >= list->capacity), "invalid elem index"; PrintFuncPosition();  return ;);
 
     int new_tail_id = list->free_node;
     list->data[new_tail_id].number = value;  
@@ -27,13 +29,13 @@ int ListPushTail(List* list, elem_t value) {
 
     return value;
 }
-
+//func return list size
 int ListPushHead(List* list, elem_t value) {
 
     if (list->size >= list->capacity) {
-        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid list size for push: %d\n", __PRETTY_FUNCTION__, __LINE__, list->size);
-        return InvalidNodeId;
-    }
+        // fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid list size for push: %d\n", __PRETTY_FUNCTION__, __LINE__, list->size);
+        // return InvalidNodeId;
+    } //call resize
     // Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
 
     int new_head_id = list->free_node;
@@ -43,7 +45,6 @@ int ListPushHead(List* list, elem_t value) {
 
     if (list->size == ListInitSize) {
         list->tail = new_head_id;
-        // list->data[list->tail].prev = new_head_id;
     }
 
     list->data[list->head].prev = list->free_node; 
@@ -58,7 +59,7 @@ int ListPushHead(List* list, elem_t value) {
 
     return value;
 }
-
+//do func to find logic address
 int ListPushRight(List* list, int node_id, elem_t value) {
 
     // if (node_id < 0 || node_id >= list->capacity) {
@@ -115,6 +116,41 @@ int ListPushLeft(List* list, int node_id, elem_t value) {
 
     return ListPushRight(list, left_neighbour, value);
 }
+// Find for logic index
+// Find first elem по значению
+// find physical addres on logic and reverse
+int FindPhysAddress(List* list, int logic_id) {
+    if (logic_id) {
+        return ;
+    }
+
+    int current_node_id = list->head;
+    for (int node_counter = 1; node_counter < logic_id; node_counter++) {
+
+        current_node_id = list->data[current_node_id].next;
+    }
+
+    return current_node_id;
+}
+
+int FindLogicAddress(List* list, int phys_id) {
+    if (phys_id) {
+        return ;
+    }
+
+    int current_node_id = list->head;
+    int node_counter = 1;
+    for ( ; current_node_id != phys_id; node_counter++) {
+
+        current_node_id = list->data[current_node_id].next;
+
+        if(node_counter == list->size) {
+            break;
+        }
+    }
+
+    return node_counter;
+}
 
 int ListDeleteNode(List* list, int node_id) {
 
@@ -125,12 +161,9 @@ int ListDeleteNode(List* list, int node_id) {
     }
     // Validator(list->data[node_id].number == Free_Node || list->size == ListInitSize, "can't delete this node", PrintFuncPosition(); \
     return -1;)
-    if (list->size == ListInitSize + 1) {
-        list->tail = 0;
-        list->head = 0;
-        list->data[1].next   = list->free_node;
-        list->list_is_linear = false;
-        list->free_node      = 1;
+    if (list->size == ListInitSize + 1) { //check that
+
+        ClearList(list);
     }
     else if (node_id == list->tail) {
 
@@ -147,6 +180,18 @@ int ListDeleteNode(List* list, int node_id) {
     list->size --;
 
     return node_id;
+}
+
+void ClearList(List* list) {
+
+    list->tail = 0;
+    list->head = 0;
+    list->data[1].next   = list->free_node;
+    list->list_is_linear = false;
+    list->free_node      = 1;
+
+    //free node
+    //do liner
 }
 
 void DeleteNode(List* list, int node_id) {
@@ -182,9 +227,7 @@ void DeleteHead(List* list, int node_id) {
     AddFreeNodeAfterDelete(list, node_id);
 
     list->head = node_id_neighbour;
-    list->data[node_id_neighbour].prev = 0;   
-
-    list->list_is_linear = false;
+    list->data[node_id_neighbour].prev = 0;
 }
 
 void AddFreeNodeAfterDelete(List* list, int node_id) {
@@ -204,7 +247,7 @@ int ListLinerize(List* list) {
         return ListIsLinerized;
     }
     node* new_data = (node*) calloc(list->capacity, sizeof(node));
-    // Validator(new_data == nullptr, "calloc could't give memory", PrintFuncPosition(););
+    Validator(new_data == nullptr, "calloc could't give memory", return 523);
 
     int list_ptr     = list->head;
     list->head       = 1;
@@ -250,11 +293,11 @@ List ListResize(List* list, int new_capacity) {
     
     ListLinerize(list);
     list->data = (node*) realloc(list->data, new_capacity*sizeof(node));
-    // Validator(new_data == nullptr, "realloc could't give memory", PrintFuncPosition(););
-    
+    // Validator(list->data == nullptr, "in realloc: couldn't give memory", PrintFuncPosition(); exit(EXIT_FAILURE););
+
     if (new_capacity >= list->capacity) {
         
-        int node_id    = list->capacity;
+        int node_id = list->capacity;
         for ( ; node_id < new_capacity; node_id++) {
             list->data[node_id].prev   = node_id - 1;
             list->data[node_id].number = Free_Node;
