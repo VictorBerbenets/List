@@ -91,7 +91,7 @@ int ListPushRight(List* list, int node_id, elem_t value) {
 
 int ListPushLeft(List* list, int node_id, elem_t value) {
 
-    if (node_id < 0 || node_id >= list->capacity) {
+    if (node_id <= 0 || node_id >= list->capacity) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
         return InvalidNodeId;
     }
@@ -101,20 +101,20 @@ int ListPushLeft(List* list, int node_id, elem_t value) {
         return ListPushHead(list, value);
     }
 
-    int new_elem_id       = list->free_node;
-    int node_id_neighbour = list->data[node_id].prev;
-    list->data[new_elem_id].number = value;
+    // int new_elem_id       = list->free_node;
+    // int node_id_neighbour = list->data[node_id].prev;
+    // list->data[new_elem_id].number = value;
 
-    FindFreeNode();
+    // FindFreeNode();
 
-    list->data[new_elem_id].next       = node_id;
-    list->data[node_id_neighbour].next = new_elem_id;
-    list->data[node_id].prev           = new_elem_id;
-    list->data[new_elem_id].prev       = node_id_neighbour;
+    // list->data[new_elem_id].next       = node_id;
+    // list->data[node_id_neighbour].next = new_elem_id;
+    // list->data[node_id].prev           = new_elem_id;
+    // list->data[new_elem_id].prev       = node_id_neighbour;
     
-    list->size ++;
+    // list->size ++;
 
-    return value;
+    return ListPushRight(list, node_id - 1, value);
 }
 
 int ListDeleteNode(List* list, int node_id) {
@@ -228,7 +228,10 @@ List ListLinerize(List* list) {
 
 List ListResize(List* list, int new_capacity) {
 
-
+    if (new_capacity < list->size) {
+        fprintf(stderr, "" White "%s:%d:" Red "Warning:" Grey "good job, fucker: you just erased some list's data: \n",\
+         __PRETTY_FUNCTION__, __LINE__);
+    }
 
 }
 
