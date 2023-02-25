@@ -36,6 +36,7 @@ enum List_params {
 
     Free_Node       =  -0xDEADFEED,
     Null_Elem       =  -777,
+    ListIsLinerized =  333,
     ListInitSize    =  1,
     Null_Node       =  0,
 };
@@ -74,7 +75,7 @@ void AddFreeNodeAfterDelete(List* list, int cell_id);
 
 List ListResize(List* list, int new_capacity);
 
-List ListLinerize(List* list);
+int ListLinerize(List* list);
 
 
 #endif

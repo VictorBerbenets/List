@@ -128,8 +128,9 @@ int ListDeleteNode(List* list, int node_id) {
     if (list->size == ListInitSize + 1) {
         list->tail = 0;
         list->head = 0;
-        list->data[1].next = list->free_node;
-        list->free_node = 1;
+        list->data[1].next   = list->free_node;
+        list->list_is_linear = false;
+        list->free_node      = 1;
     }
     else if (node_id == list->tail) {
 
@@ -158,6 +159,8 @@ void DeleteNode(List* list, int node_id) {
 
     list->data[right_neighbour].prev = left_neighbour;
     list->data[left_neighbour].next  = right_neighbour;
+
+    list->list_is_linear = false;
 }
 
 void DeleteTail(List* list, int node_id) {
@@ -180,6 +183,8 @@ void DeleteHead(List* list, int node_id) {
 
     list->head = node_id_neighbour;
     list->data[node_id_neighbour].prev = 0;   
+
+    list->list_is_linear = false;
 }
 
 void AddFreeNodeAfterDelete(List* list, int node_id) {
@@ -192,8 +197,12 @@ void AddFreeNodeAfterDelete(List* list, int node_id) {
     list->data[node_id].prev = list->data[old_free_node].prev;
 }
 
-List ListLinerize(List* list) {
+int ListLinerize(List* list) {
 
+    if (list->list_is_linear == true) {
+
+        return ListIsLinerized;
+    }
     node* new_data = (node*) calloc(list->capacity, sizeof(node));
     // Validator(new_data == nullptr, "calloc could't give memory", PrintFuncPosition(););
 
@@ -228,16 +237,45 @@ List ListLinerize(List* list) {
 
     list->list_is_linear = true;
 
-    return *list;
+    return 0;
 }
 
 List ListResize(List* list, int new_capacity) {
 
+
     if (new_capacity < list->size) {
-        fprintf(stderr, "" White "%s:%d:" Red "Warning:" Grey "good job, fucker: you just erased some list's data: \n",\
+        fprintf(stderr, "" White "%s:%d:" Purple "Warning:" Grey "good job, fucker: you just erased some list's data: \n",\
          __PRETTY_FUNCTION__, __LINE__);
     }
+    
+    ListLinerize(list);
+    list->data = (node*) realloc(list->data, new_capacity*sizeof(node));
+    // Validator(new_data == nullptr, "realloc could't give memory", PrintFuncPosition(););
+    
+    if (new_capacity >= list->capacity) {
+        
+        int node_id    = list->capacity;
+        for ( ; node_id < new_capacity; node_id++) {
+            list->data[node_id].prev   = node_id - 1;
+            list->data[node_id].number = Free_Node;
+            list->data[node_id].next   = node_id + 1;
+        }
 
+        list->data[node_id - 1].next = node_id - 1;
+    }
+    else if (list->size < new_capacity) {
+        list->data[new_capacity - 1].next = new_capacity - 1;
+    }
+    else {
+        list->size = new_capacity;
+        list->tail = new_capacity - 1;
+        list->data[list->tail].next = 0;
+        list->free_node = new_capacity;
+    }
+
+    list->capacity = new_capacity;
+    
+    return *list;
 }
 
 void ListCtor(List* list, int capacity, int line, const char* func, const char* file) {
