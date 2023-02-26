@@ -7,7 +7,6 @@ int ListPushTail(List* list, elem_t value) {
     if (list->size >= list->capacity) {
         ListResize(list, list->size + AdditionalMemory);
     } 
-    Validator((list->size >= list->capacity), "invalid elem index"; PrintFuncPosition();  return ;);
 
     int new_tail_id = list->free_node;
     list->data[new_tail_id].number = value;  
@@ -258,10 +257,11 @@ int ListLinerize(List* list) {
     Validator(new_data == nullptr, "calloc could't give memory", return 523;);
 
     int list_ptr = list->head;
+    if (list->head) { list->head = 1; }
+
     list->tail   = list->size - 1;
 
     int node_counter = 0;
-
     new_data[node_counter].prev   = 0;
     new_data[node_counter].number = 0;
     new_data[node_counter].next   = 0;
@@ -298,12 +298,14 @@ List ListResize(List* list, int new_capacity) {
         fprintf(stderr, "" White "%s:%d:" Purple "Warning:" Grey "good job, fucker: you just erased some list's data: \n",\
          __PRETTY_FUNCTION__, __LINE__);
     }
-    
-    ListLinerize(list);
+    if (!list->list_is_linear) {
+        ListLinerize(list);
+        list->list_is_linear = true;
+    }
     list->data = (node*) realloc(list->data, new_capacity*sizeof(node));
     Validator(list->data == nullptr, "in realloc: couldn't give memory", exit(EXIT_FAILURE););
 
-    if (new_capacity >= list->capacity) {
+    if (new_capacity > list->capacity) {
         
         int node_id = list->capacity;
         for ( ; node_id < new_capacity; node_id++) {
@@ -313,9 +315,11 @@ List ListResize(List* list, int new_capacity) {
         }
 
         list->data[node_id - 1].next = node_id - 1;
+        list->free_node = list->capacity;
     }
     else if (list->size < new_capacity) {
         list->data[new_capacity - 1].next = new_capacity - 1;
+        list->free_node = list->size;
     }
     else {
         list->size = new_capacity;
