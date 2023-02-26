@@ -4,10 +4,9 @@
 
 int ListPushTail(List* list, elem_t value) {
 
-    // if (list->size >= list->capacity) {
-    //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid list size for push: %d\n", __PRETTY_FUNCTION__, __LINE__, list->size);
-    //     return InvalidNodeId;
-    // } //call resize
+    if (list->size >= list->capacity) {
+        ListResize(list, list->size + AdditionalMemory);
+    } 
     Validator((list->size >= list->capacity), "invalid elem index"; PrintFuncPosition();  return ;);
 
     int new_tail_id = list->free_node;
@@ -29,14 +28,12 @@ int ListPushTail(List* list, elem_t value) {
 
     return value;
 }
-//func return list size
+
 int ListPushHead(List* list, elem_t value) {
 
     if (list->size >= list->capacity) {
-        // fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid list size for push: %d\n", __PRETTY_FUNCTION__, __LINE__, list->size);
-        // return InvalidNodeId;
-    } //call resize
-    // Validator((list->size >= list->capacity - 1), "invalid elem index"; PrintFuncPosition();  return ;);
+        ListResize(list, list->size + AdditionalMemory);
+    } 
 
     int new_head_id = list->free_node;
 
@@ -62,15 +59,16 @@ int ListPushHead(List* list, elem_t value) {
 //do func to find logic address
 int ListPushRight(List* list, int node_id, elem_t value) {
 
-    // if (node_id < 0 || node_id >= list->capacity) {
-    //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
-    //     return InvalidNodeId;
-    // }
-    // if (list->data[node_id].number == Free_Node || list->size >= list->capacity) {
+    if (node_id <= 0 || node_id >= list->capacity) {
+        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
+        return InvalidNodeId;
+    }
+    if (list->data[node_id].number == Free_Node) {
 
-    //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
-    //     return InvalidNodeId;
-    // }
+        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id. This elem is not a part of the list: %d\n", \
+        __PRETTY_FUNCTION__, __LINE__, node_id);
+        return InvalidNodeId;
+    }
 
     if (list->size == ListInitSize || node_id == list->tail) {
         
@@ -97,15 +95,16 @@ int ListPushRight(List* list, int node_id, elem_t value) {
 
 int ListPushLeft(List* list, int node_id, elem_t value) {
 
-    // if (node_id <= 0 || node_id >= list->capacity) {
-    //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
-    //     return InvalidNodeId;
-    // }
-    // if (list->data[node_id].number == Free_Node || list->size >= list->capacity) {
+    if (node_id <= 0 || node_id >= list->capacity) {
+        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
+        return InvalidNodeId;
+    }
+    if (list->data[node_id].number == Free_Node) {
 
-    //     fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
-    //     return InvalidNodeId;
-    // }
+        fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id. This elem is not a part of the list: %d\n", \
+        __PRETTY_FUNCTION__, __LINE__, node_id);
+        return InvalidNodeId;
+    }
 
     if (list->size == ListInitSize || node_id == list->head) {
         
@@ -116,9 +115,7 @@ int ListPushLeft(List* list, int node_id, elem_t value) {
 
     return ListPushRight(list, left_neighbour, value);
 }
-// Find for logic index
-// Find first elem по значению
-// find physical addres on logic and reverse
+
 int FindFirstListElem(List* list, elem_t value) {
 
     int node_id = list->head;
@@ -136,6 +133,9 @@ int FindPhysAddress(List* list, int logic_id) {
     
     if (list->size == ListInitSize || logic_id <= 0 || logic_id > list->size) {
         return InvalidLogicId;
+    }
+    if (logic_id == FirstListElem) {
+        return list->head;
     }
 
     int current_node_id = list->head;
@@ -169,11 +169,10 @@ int ListDeleteNode(List* list, int node_id) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey " can't delete this node\n", __PRETTY_FUNCTION__, __LINE__);
         return InvalidNodeId;
     }
-    // Validator(list->data[node_id].number == Free_Node || list->size == ListInitSize, "can't delete this node", PrintFuncPosition(); \
-    return -1;)
-    if (list->size == ListInitSize + 1) { //check that
-        printf("AAAAAAAAAAAAAAAAAAAAAAA\n");
+
+    if (list->size == ListInitSize + 1) { 
         ClearList(list);
+        return ListIsCleared;
     }
     else if (node_id == list->tail) {
 
@@ -194,16 +193,12 @@ int ListDeleteNode(List* list, int node_id) {
 
 void ClearList(List* list) {
 
-    list->data[list->tail].number = Free_Node;
-    list->data[list->head].number = Free_Node;
     list->tail = 0;
     list->head = 0;
-    list->data[1].next   = list->free_node;
-    list->list_is_linear = false;
-    list->free_node      = 1;
 
-    //free node
-    //do liner
+    list->size --;
+    ListLinerize(list);
+
 }
 
 void DeleteNode(List* list, int node_id) {
@@ -248,6 +243,7 @@ void AddFreeNodeAfterDelete(List* list, int node_id) {
 
     list->data[old_free_node].prev = node_id;
     list->free_node = node_id;
+
     list->data[node_id].next = old_free_node;
     list->data[node_id].prev = list->data[old_free_node].prev;
 }
@@ -259,11 +255,11 @@ int ListLinerize(List* list) {
         return ListIsLinerized;
     }
     node* new_data = (node*) calloc(list->capacity, sizeof(node));
-    Validator(new_data == nullptr, "calloc could't give memory", return 523);
+    Validator(new_data == nullptr, "calloc could't give memory", return 523;);
 
-    int list_ptr     = list->head;
-    list->head       = 1;
-    list->tail       = list->size - 1;
+    int list_ptr = list->head;
+    list->tail   = list->size - 1;
+
     int node_counter = 0;
 
     new_data[node_counter].prev   = 0;
@@ -305,7 +301,7 @@ List ListResize(List* list, int new_capacity) {
     
     ListLinerize(list);
     list->data = (node*) realloc(list->data, new_capacity*sizeof(node));
-    // Validator(list->data == nullptr, "in realloc: couldn't give memory", PrintFuncPosition(); exit(EXIT_FAILURE););
+    Validator(list->data == nullptr, "in realloc: couldn't give memory", exit(EXIT_FAILURE););
 
     if (new_capacity >= list->capacity) {
         
@@ -351,12 +347,15 @@ void ListCtor(List* list, int capacity, int line, const char* func, const char* 
     list->data[Null_Node].prev = 0;
 
     list->free_node = 1;
-
-    for (int node_number = 1; node_number < capacity; node_number++) {
+    int node_number = 1;
+    for ( ; node_number < capacity; node_number++) {
         list->data[node_number].prev   = node_number - 1;
         list->data[node_number].number = Free_Node;
         list->data[node_number].next   = node_number + 1;
     }
+
+    // last elem points to itself
+    list->data[node_number - 1].next = node_number - 1; 
 
     list->list_is_linear = true;
 }

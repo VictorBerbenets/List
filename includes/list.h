@@ -34,11 +34,14 @@ typedef struct {
 
 enum List_params {
 
-    Free_Node       =  -0xDEADFEED,
-    Null_Elem       =  -777,
-    ListIsLinerized =  333,
-    ListInitSize    =  1,
-    Null_Node       =  0,
+    Free_Node         =  -0xDEADFEED,
+    Null_Elem         =  -777,
+    ListIsLinerized   =  333,
+    AdditionalMemory  =  10,
+    ListIsCleared     =  9,
+    FirstListElem     =  1,
+    ListInitSize      =  1,
+    Null_Node         =  0,
 };
 
 enum ListErrors {
