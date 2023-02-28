@@ -35,12 +35,12 @@ typedef struct {
 enum List_params {
 
     Free_Node         =  -0xDEADFEED,
-    Null_Elem         =  -777,
     ListIsLinerized   =  333,
     AdditionalMemory  =  10,
     ListIsCleared     =  9,
     FirstListElem     =  1,
     ListInitSize      =  1,
+    Null_Elem         =  0,
     Null_Node         =  0,
 };
 
@@ -86,6 +86,8 @@ void AddFreeNodeAfterDelete(List* list, int cell_id);
 List ListResize(List* list, int new_capacity);
 
 int ListLinerize(List* list);
+
+void ListGraph(List* list);
 
 void ClearList(List* list);
 

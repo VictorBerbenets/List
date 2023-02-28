@@ -20,4 +20,7 @@
 
 #define PrintBlueLine() \
     fprintf(stderr, "" Blue "---------------------------------------------------------------------------------------------" Grey "\n");
+
+#define PrintDot(...) fprintf(dot_file, __VA_ARGS__);
+
 #endif
