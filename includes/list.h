@@ -10,7 +10,7 @@
 #include "defines.h"
 
 typedef double elem_t;
-const int List_size = 1024;
+const int Max_Dot_Command_Len = 100;
 
 typedef struct {
 
@@ -29,6 +29,7 @@ typedef struct {
     int head;
     int free_node;
     int list_is_linear;
+    int Dump_Number;
 
 } List;
 
@@ -46,9 +47,9 @@ enum List_params {
 
 enum ListErrors {
 
-    InvalidLogicId = -101,
-    InvalidNodeId  = 100,
-    MemoryGetError,
+    MEM_ALLOCATED_ERR   = 5353535, 
+    INVALID_LOGIC_ID    = -101,
+    INVALID_NODE_ID     = 100,
 } ;
 
 void ListCtor(List* list, int capacity, int line, const char* func, const char* file);

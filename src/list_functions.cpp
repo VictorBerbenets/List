@@ -60,14 +60,14 @@ int ListPushRight(List *list, int node_id, elem_t value) {
 
     if (node_id <= 0 || node_id >= list->capacity) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
-        return InvalidNodeId;
+        return INVALID_NODE_ID;
     }
 
     if (list->data[node_id].number == Free_Node) {
 
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id. This elem is not a part of the list: %d\n",
                 __PRETTY_FUNCTION__, __LINE__, node_id);
-        return InvalidNodeId;
+        return INVALID_NODE_ID;
     }
 
     if (list->size >= list->capacity) {
@@ -102,14 +102,14 @@ int ListPushLeft(List *list, int node_id, elem_t value) {
 
     if (node_id <= 0 || node_id >= list->capacity) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
-        return InvalidNodeId;
+        return INVALID_NODE_ID;
     }
 
     if (list->data[node_id].number == Free_Node) {
 
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id. This elem is not a part of the list: %d\n",
                 __PRETTY_FUNCTION__, __LINE__, node_id);
-        return InvalidNodeId;
+        return INVALID_NODE_ID;
     }
 
     if (list->size >= list->capacity) {
@@ -142,7 +142,7 @@ int FindFirstListElem(List *list, elem_t value) {
 int FindPhysAddress(List *list, int logic_id) {
 
     if (list->size == ListInitSize || logic_id <= 0 || logic_id > list->size) {
-        return InvalidLogicId;
+        return INVALID_LOGIC_ID;
     }
     if (logic_id == FirstListElem) {
         return list->head;
@@ -160,7 +160,7 @@ int FindPhysAddress(List *list, int logic_id) {
 int FindLogicAddress(List *list, int phys_id) {
 
     if (list->size == ListInitSize || phys_id <= 0 || phys_id >= list->capacity) {
-        return InvalidLogicId;
+        return INVALID_LOGIC_ID;
     }
 
     int current_node_id = list->head;
@@ -178,7 +178,7 @@ int ListDeleteNode(List *list, int node_id) {
     int node_id_neighbour = 0;
     if (list->size <= 1 || list->size > list->capacity - 1) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey " can't delete this node\n", __PRETTY_FUNCTION__, __LINE__);
-        return InvalidNodeId;
+        return INVALID_NODE_ID;
     }
 
     if (list->size == ListInitSize + 1) {
@@ -269,7 +269,7 @@ int ListLinerize(List *list) {
     }
 
     node *new_data = (node *)calloc(list->capacity, sizeof(node));
-    Validator(new_data == nullptr, "calloc could't give memory", return 523;);
+    Validator(new_data == nullptr, "calloc could't give memory", return MEM_ALLOCATED_ERR;);
 
     int list_ptr = list->head;
     if (list->head) {
@@ -389,6 +389,7 @@ void ListCtor(List *list, int capacity, int line, const char *func, const char *
     list->data[node_number - 1].next = node_number - 1;
 
     list->list_is_linear = true;
+    list->Dump_Number = 0;
 }
 
 void ListDtor(List *list, int line, const char *func, const char *file) {
@@ -401,7 +402,9 @@ void ListDtor(List *list, int line, const char *func, const char *file) {
         list->data[node_number].number = 0;
         list->data[node_number].next = 0;
     }
-    list->capacity = 0;
+    list->capacity       = 0;
+    list->Dump_Number    = 0;
+    list->list_is_linear = 0;
 
     free(list->data);
     list->data = nullptr;
@@ -465,7 +468,10 @@ void ListInform(List *list, int line, const char *func, const char *file) {
 
 void ListGraph(List *list) {
 
-    FILE *dot_file = fopen("list.dot", "w+");
+    char file_name[100] = "list.dot0";
+    // sprintf(file_name, "list.dot%d", list->Dump_Number);
+    FILE *dot_file = fopen(file_name, "w+");
+    printf("dot_file = %d\n", dot_file == nullptr);
 
     const char dot_header[] = "digraph List {\n"
                               "\tdpi = 100;\n"
@@ -479,10 +485,10 @@ void ListGraph(List *list) {
     PrintDot(dot_header);
 
     // General list information
-    PrintDot("List_Inform [shape = record, color = purple, style = filled, label = \"{free:%d | size:%d | capacity: %d}\"]\n\n",
+    PrintDot("List_Inform [shape = record, color = purple, style = solid, label = \"free:%d | size:%d | capacity: %d\"]\n\n",
              list->free_node, list->size, list->capacity);
 
-    PrintDot("node%d [shape = record, color = brown, style = filled, label = \"{node_id:%d|<p> prev:%d| value:%d|<n>next:%d}\"]\n",
+    PrintDot("node%d [shape = record, color = brown, style = solid, label = \"node_id:%d|<p> prev:%d| value:%d|<n>next:%d\"]\n",
              0, 0, Null_Node, Null_Elem, Null_Node);
     // PrintDot("Nothing -> node%d\n", Null_Node);
 
@@ -491,19 +497,19 @@ void ListGraph(List *list) {
 
         if (phys_node_id == list->head)
         {
-            PrintDot("node%d [shape = record, color = red, style = filled, label = \"{node_id:%d|<p> prev:%d| value:%lg|<n>next:%d}\"]\n",
+            PrintDot("node%d [shape = record, color = red, style = solid, label = \"node_id:%d|<p> prev:%d| value:%lg|<n>next:%d\"]\n",
                      phys_node_id, phys_node_id, list->data[phys_node_id].prev, list->data[phys_node_id].number, list->data[phys_node_id].next);
             // PrintDot("Head -> node%d\n", phys_node_id);
         }
         if (phys_node_id == list->tail)
         {
-            PrintDot("node%d [shape = record, color = red, style = filled, label = \"{node_id:%d|<p> prev:%d| value:%lg|<n>next:%d}\"]\n",
+            PrintDot("node%d [shape = record, color = red, style = solid, label = \"node_id:%d|<p> prev:%d| value:%lg|<n>next:%d\"]\n",
                      phys_node_id, phys_node_id, list->data[phys_node_id].prev, list->data[phys_node_id].number, list->data[phys_node_id].next);
             // PrintDot("Tail -> node%d\n", phys_node_id);
         }
         if (phys_node_id != list->head && phys_node_id != list->tail)
         {
-            PrintDot("node%d [shape = record, color = green, style = filled, label = \"{node_id:%d|<p> prev:%d| value:%lg|<n>next:%d}\"]\n",
+            PrintDot("node%d [shape = record, color = green, style = solid, label = \"node_id:%d|<p> prev:%d| value:%lg|<n>next:%d\"]\n",
                      phys_node_id, phys_node_id, list->data[phys_node_id].prev, list->data[phys_node_id].number, list->data[phys_node_id].next);
         }
     }
@@ -523,13 +529,13 @@ void ListGraph(List *list) {
     for (int i = list->size; i < list->capacity; i++, node_ptr = list->data[node_ptr].next) {
         PrintDot("-> node%d ", node_ptr);
     }
-
-    PrintDot("\nHead -> node%d\n", list->tail);
-    PrintDot("Tail -> node%d\n", list->head);
+    // PrintDot("Head -> Tail -> Free_Node -> Null\n")
+    PrintDot("\nHead -> node%d\n", list->head);
+    PrintDot("Tail -> node%d\n", list->tail);
     PrintDot("Free_Node -> node%d\n", list->free_node);
     PrintDot("Null -> node%d\n", Null_Node);
     // making visible connections
-    
+
     PrintDot("edge[style=solid, constraint = false]")
     PrintDot("node%d:p -> node%d;", list->head, Null_Elem);
     PrintDot("node%d:n ", list->head);
@@ -566,11 +572,27 @@ void ListGraph(List *list) {
     }
     PrintDot(" -> node%d\n", node_id);
 
-    PrintDot("Head -> node%d\n", list->tail);
-    PrintDot("Tail -> node%d\n", list->head);
+    // PrintDot("\n{rank = same; \"Head\"; \"Tail\"; \"Free\"; \"Null\";}\n");
+    // PrintDot("{rank = same; \"Head\"; node%d}\n", list->head);
+    // PrintDot("{rank = same; \"Tail\"; node%d}\n", list->tail);
+    // PrintDot("{rank = same; \"Free\"; node%d}\n", list->free_node);
+    // PrintDot("{rank = same; \"Null\"; node%d}\n", Null_Node);
+    PrintDot("Head -> node%d\n", list->head);
+    PrintDot("Tail -> node%d\n", list->tail);
     PrintDot("Free_Node -> node%d\n", list->free_node);
     PrintDot("Null -> node%d\n", Null_Node);
-    PrintDot("\n}\n");
+    PrintDot("}\n");
+
+
+    char dot_png[Max_Dot_Command_Len + 100] = "";
+
+    sprintf(dot_png, "dot -Tpng %s -o graph_%d.png", file_name, list->Dump_Number);
+    // sprintf(dot_png, "dot -Tpng  -O %s", file_name);
+
+    printf("DOT = %s\n", dot_png);
+    printf("system = %d\n", system(dot_png));
+
+    list->Dump_Number++;
 
     fclose(dot_file);
 }
