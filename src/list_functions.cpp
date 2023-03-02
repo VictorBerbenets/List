@@ -443,7 +443,7 @@ void ListInform(List *list, int line, const char *func, const char *file) {
     fprintf(stderr, "list elemenst from 'head' to 'tail' in order:\n");
     PrintBlueLine()
 
-        int data_num = 1;
+    int data_num = 1;
     int elem_id = list->head;
 
     for (; data_num < list->size; data_num++, elem_id = list->data[elem_id].next) {
@@ -468,11 +468,12 @@ void ListInform(List *list, int line, const char *func, const char *file) {
     ListGraph(list);
 }
 
-void ListGraph(List *list) {
+int ListGraph(List *list) {
 
     char file_name[100] = "data//list.dot";
     
     FILE *dot_file = fopen(file_name, "w+");
+    Validator(dot_file == nullptr, in openning file:'data//list.dot', return OPEN_FILE_ERROR;);
 
     const char dot_header[] = "digraph List {\n"
                               "\tdpi = 100;\n"
@@ -519,7 +520,7 @@ void ListGraph(List *list) {
     // making invisible connections
     int node_ptr = list->head;
     PrintDot("edge[style=invis, constraint = true]")
-        PrintDot("node%d ", Null_Node);
+    PrintDot("node%d ", Null_Node);
     for (int i = 1; i < list->size; i++, node_ptr = list->data[node_ptr].next) {
         PrintDot("-> node%d ", node_ptr);
     }
@@ -579,12 +580,13 @@ void ListGraph(List *list) {
     PrintDot("}\n");
 
     char dot_png[Max_Dot_Command_Len] = "";
-
     sprintf(dot_png, "dot -Tpng %s -o data//graph_%d.png", file_name, list->Dump_Number);
-    fclose(dot_file);
+
+    char is_file_closed = fclose(dot_file);
+    Validator((is_file_closed != 0), in closing file: 'data//list.dot', return CLOSE_FILE_ERROR;);
 
     system(dot_png);
 
     list->Dump_Number++;
-
+    return list->Dump_Number;
 }

@@ -6,6 +6,7 @@ int main() {
 
     List list = {};
     ListConstructor(list, 15);
+    ListDump(list);
 
     ListPushHead(&list, 1488);
     ListDump(list);

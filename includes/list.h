@@ -50,6 +50,8 @@ enum ListErrors {
     MEM_ALLOCATED_ERR   = 5353535, 
     INVALID_LOGIC_ID    = -101,
     INVALID_NODE_ID     = 100,
+    CLOSE_FILE_ERROR    = 0XDEADFEED,
+    OPEN_FILE_ERROR     = 0XDEADBABE,
 } ;
 
 void ListCtor(List* list, int capacity, int line, const char* func, const char* file);
@@ -88,7 +90,7 @@ List ListResize(List* list, int new_capacity);
 
 int ListLinerize(List* list);
 
-void ListGraph(List* list);
+int ListGraph(List* list);
 
 void ClearList(List* list);
 
