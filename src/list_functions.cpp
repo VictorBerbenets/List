@@ -468,10 +468,9 @@ void ListInform(List *list, int line, const char *func, const char *file) {
 
 void ListGraph(List *list) {
 
-    char file_name[100] = "list.dot0";
-    // sprintf(file_name, "list.dot%d", list->Dump_Number);
+    char file_name[100] = "data//list.dot";
+    
     FILE *dot_file = fopen(file_name, "w+");
-    printf("dot_file = %d\n", dot_file == nullptr);
 
     const char dot_header[] = "digraph List {\n"
                               "\tdpi = 100;\n"
@@ -584,15 +583,13 @@ void ListGraph(List *list) {
     PrintDot("}\n");
 
 
-    char dot_png[Max_Dot_Command_Len + 100] = "";
+    char dot_png[Max_Dot_Command_Len] = "";
 
-    sprintf(dot_png, "dot -Tpng %s -o graph_%d.png", file_name, list->Dump_Number);
-    // sprintf(dot_png, "dot -Tpng  -O %s", file_name);
+    sprintf(dot_png, "dot -Tpng %s -o data//graph_%d.png", file_name, list->Dump_Number);
+    fclose(dot_file);
 
-    printf("DOT = %s\n", dot_png);
-    printf("system = %d\n", system(dot_png));
+    system(dot_png);
 
     list->Dump_Number++;
 
-    fclose(dot_file);
 }
