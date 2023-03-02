@@ -10,7 +10,7 @@
 #include "defines.h"
 
 typedef double elem_t;
-const int Max_Dot_Command_Len = 100;
+const int Max_Dot_Command_Len = 150;
 
 typedef struct {
 

@@ -6,35 +6,35 @@ digraph List {
 	edge [color = darkgrey, arrowhead = onormal, arrowsize = 1, penwidth = 1.2]
 	graph[fillcolor = lightgreen, ranksep = 1.3, nodesep = 0.5,style = "rounded, filled",color = green, penwidth = 2]
 
-List_Inform [shape = record, color = purple, style = solid, label = "free:14 | size:14 | capacity: 15"]
+List_Inform [shape = record, color = purple, style = solid, label = "linear:true | free:9 | size:9 | capacity: 15"]
 
 node0 [shape = record, color = brown, style = solid, label = "node_id:0|<p> prev:0| value:0|<n>next:0"]
-node1 [shape = record, color = red, style = solid, label = "node_id:1|<p> prev:0| value:523|<n>next:2"]
-node2 [shape = record, color = green, style = solid, label = "node_id:2|<p> prev:1| value:1|<n>next:3"]
-node3 [shape = record, color = green, style = solid, label = "node_id:3|<p> prev:2| value:2|<n>next:4"]
-node4 [shape = record, color = green, style = solid, label = "node_id:4|<p> prev:3| value:3|<n>next:5"]
-node5 [shape = record, color = green, style = solid, label = "node_id:5|<p> prev:4| value:4|<n>next:6"]
-node6 [shape = record, color = green, style = solid, label = "node_id:6|<p> prev:5| value:5|<n>next:7"]
-node7 [shape = record, color = green, style = solid, label = "node_id:7|<p> prev:6| value:6|<n>next:8"]
-node8 [shape = record, color = green, style = solid, label = "node_id:8|<p> prev:7| value:7|<n>next:9"]
-node9 [shape = record, color = green, style = solid, label = "node_id:9|<p> prev:8| value:8|<n>next:10"]
-node10 [shape = record, color = green, style = solid, label = "node_id:10|<p> prev:9| value:9|<n>next:11"]
-node11 [shape = record, color = green, style = solid, label = "node_id:11|<p> prev:10| value:10|<n>next:12"]
-node12 [shape = record, color = green, style = solid, label = "node_id:12|<p> prev:11| value:11|<n>next:13"]
-node13 [shape = record, color = red, style = solid, label = "node_id:13|<p> prev:12| value:12|<n>next:0"]
+node1 [shape = record, color = red, style = solid, label = "node_id:1|<p> prev:0| value:6000|<n>next:2"]
+node2 [shape = record, color = green, style = solid, label = "node_id:2|<p> prev:1| value:2200|<n>next:3"]
+node3 [shape = record, color = green, style = solid, label = "node_id:3|<p> prev:2| value:2700|<n>next:4"]
+node4 [shape = record, color = green, style = solid, label = "node_id:4|<p> prev:3| value:2000|<n>next:5"]
+node5 [shape = record, color = green, style = solid, label = "node_id:5|<p> prev:4| value:3000|<n>next:6"]
+node6 [shape = record, color = green, style = solid, label = "node_id:6|<p> prev:5| value:5000|<n>next:7"]
+node7 [shape = record, color = green, style = solid, label = "node_id:7|<p> prev:6| value:7000|<n>next:8"]
+node8 [shape = record, color = red, style = solid, label = "node_id:8|<p> prev:7| value:7000|<n>next:0"]
+node9 [shape = record, color = green, style = solid, label = "node_id:9|<p> prev:8| value:5.59022e+08|<n>next:10"]
+node10 [shape = record, color = green, style = solid, label = "node_id:10|<p> prev:9| value:5.59022e+08|<n>next:11"]
+node11 [shape = record, color = green, style = solid, label = "node_id:11|<p> prev:10| value:5.59022e+08|<n>next:12"]
+node12 [shape = record, color = green, style = solid, label = "node_id:12|<p> prev:11| value:5.59022e+08|<n>next:13"]
+node13 [shape = record, color = green, style = solid, label = "node_id:13|<p> prev:12| value:5.59022e+08|<n>next:14"]
 node14 [shape = record, color = green, style = solid, label = "node_id:14|<p> prev:13| value:5.59022e+08|<n>next:14"]
 
 
 
 edge[style=invis, constraint = true]node0 -> node1 -> node2 -> node3 -> node4 -> node5 -> node6 -> node7 -> node8 -> node9 -> node10 -> node11 -> node12 -> node13 -> node14 -> node14 
 Head -> node1
-Tail -> node13
-Free_Node -> node14
+Tail -> node8
+Free_Node -> node9
 Null -> node0
-edge[style=solid, constraint = false]node1:p -> node0;node1:n -> node2;node2:p ->node1;node2:n -> node3;node3:p ->node2;node3:n -> node4;node4:p ->node3;node4:n -> node5;node5:p ->node4;node5:n -> node6;node6:p ->node5;node6:n -> node7;node7:p ->node6;node7:n -> node8;node8:p ->node7;node8:n -> node9;node9:p ->node8;node9:n -> node10;node10:p ->node9;node10:n -> node11;node11:p ->node10;node11:n -> node12;node12:p ->node11;node12:n -> node13;node13:p ->node12;node13:n  -> node0
-node14:n  -> node14
+edge[style=solid, constraint = false]node1:p -> node0;node1:n -> node2;node2:p ->node1;node2:n -> node3;node3:p ->node2;node3:n -> node4;node4:p ->node3;node4:n -> node5;node5:p ->node4;node5:n -> node6;node6:p ->node5;node6:n -> node7;node7:p ->node6;node7:n -> node8;node8:p ->node7;node8:n  -> node0
+node9:n -> node10 node10:p ->node9;node10:n -> node11 node11:p ->node10;node11:n -> node12 node12:p ->node11;node12:n -> node13 node13:p ->node12;node13:n -> node14 node14:p ->node13;node14:n  -> node14
 Head -> node1
-Tail -> node13
-Free_Node -> node14
+Tail -> node8
+Free_Node -> node9
 Null -> node0
 }

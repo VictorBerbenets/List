@@ -34,13 +34,16 @@ int ListPushHead(List *list, elem_t value) {
         ListResize(list, list->size + AdditionalMemory);
     }
 
-    int new_head_id = list->free_node;
+    list->list_is_linear = false;
+    int new_head_id      = list->free_node;
 
     list->data[new_head_id].number = value;
     list->data[new_head_id].prev = 0;
 
     if (list->size == ListInitSize) {
-        list->tail = new_head_id;
+
+        list->list_is_linear = true;
+        list->tail           = new_head_id;
     }
 
     list->data[list->head].prev = list->free_node;
@@ -51,7 +54,6 @@ int ListPushHead(List *list, elem_t value) {
     list->head = new_head_id;
 
     list->size++;
-    list->list_is_linear = false;
 
     return value;
 }
@@ -484,8 +486,8 @@ void ListGraph(List *list) {
     PrintDot(dot_header);
 
     // General list information
-    PrintDot("List_Inform [shape = record, color = purple, style = solid, label = \"free:%d | size:%d | capacity: %d\"]\n\n",
-             list->free_node, list->size, list->capacity);
+    PrintDot("List_Inform [shape = record, color = purple, style = solid, label = \"linear:%s | free:%d | size:%d | capacity: %d\"]\n\n",\
+            list->list_is_linear == true? "true":"false", list->free_node, list->size, list->capacity);
 
     PrintDot("node%d [shape = record, color = brown, style = solid, label = \"node_id:%d|<p> prev:%d| value:%d|<n>next:%d\"]\n",
              0, 0, Null_Node, Null_Elem, Null_Node);
@@ -528,13 +530,12 @@ void ListGraph(List *list) {
     for (int i = list->size; i < list->capacity; i++, node_ptr = list->data[node_ptr].next) {
         PrintDot("-> node%d ", node_ptr);
     }
-    // PrintDot("Head -> Tail -> Free_Node -> Null\n")
     PrintDot("\nHead -> node%d\n", list->head);
     PrintDot("Tail -> node%d\n", list->tail);
     PrintDot("Free_Node -> node%d\n", list->free_node);
     PrintDot("Null -> node%d\n", Null_Node);
+    
     // making visible connections
-
     PrintDot("edge[style=solid, constraint = false]")
     PrintDot("node%d:p -> node%d;", list->head, Null_Elem);
     PrintDot("node%d:n ", list->head);
@@ -571,17 +572,11 @@ void ListGraph(List *list) {
     }
     PrintDot(" -> node%d\n", node_id);
 
-    // PrintDot("\n{rank = same; \"Head\"; \"Tail\"; \"Free\"; \"Null\";}\n");
-    // PrintDot("{rank = same; \"Head\"; node%d}\n", list->head);
-    // PrintDot("{rank = same; \"Tail\"; node%d}\n", list->tail);
-    // PrintDot("{rank = same; \"Free\"; node%d}\n", list->free_node);
-    // PrintDot("{rank = same; \"Null\"; node%d}\n", Null_Node);
     PrintDot("Head -> node%d\n", list->head);
     PrintDot("Tail -> node%d\n", list->tail);
     PrintDot("Free_Node -> node%d\n", list->free_node);
     PrintDot("Null -> node%d\n", Null_Node);
     PrintDot("}\n");
-
 
     char dot_png[Max_Dot_Command_Len] = "";
 
