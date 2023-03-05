@@ -470,9 +470,7 @@ void ListInform(List *list, int line, const char *func, const char *file) {
 
 int ListGraph(List *list) {
 
-    char file_name[100] = "data//list.dot";
-    
-    FILE *dot_file = fopen(file_name, "w+");
+    DotStartGraph("data//list.dot");
     Validator(dot_file == nullptr, in openning file:'data//list.dot', return OPEN_FILE_ERROR;);
 
     const char dot_header[] = "digraph List {\n"
@@ -577,15 +575,9 @@ int ListGraph(List *list) {
     PrintDot("Tail -> node%d\n", list->tail);
     PrintDot("Free_Node -> node%d\n", list->free_node);
     PrintDot("Null -> node%d\n", Null_Node);
-    PrintDot("}\n");
 
-    char dot_png[Max_Dot_Command_Len] = "";
-    sprintf(dot_png, "dot -Tpng %s -o data//graph_%d.png", file_name, list->Dump_Number);
-
-    char is_file_closed = fclose(dot_file);
-    Validator((is_file_closed != 0), in closing file: 'data//list.dot', return CLOSE_FILE_ERROR;);
-
-    system(dot_png);
+    DotEndGraph(dot_file);
+    PrintGraph(file, list->Dump_Number);
 
     list->Dump_Number++;
     return list->Dump_Number;

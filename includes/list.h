@@ -8,9 +8,11 @@
 #include "colors.h"
 #include "Validator.h"
 #include "defines.h"
+#include "..//GraphvizLib//Graph.h"
 
 typedef double elem_t;
 const int Max_Dot_Command_Len = 150;
+const int File_Name = 50;
 
 typedef struct {
 
