@@ -477,12 +477,11 @@ int ListGraph(List *list) {
                               "\tdpi = 100;\n"
                               "\tfontname = \"Comic Sans MS\";\n"
                               "\tfontsize = 20;\n"
-                              "\trankdir   =  LR;\n"
-                              "\tedge [color = darkgrey, arrowhead = onormal, arrowsize = 1, penwidth = 1.2]\n"
-                              "\tgraph[fillcolor = lightgreen, ranksep = 1.3, nodesep = 0.5,"
-                              "style = \"rounded, filled\",color = green, penwidth = 2]\n\n";
-
+                              "\trankdir   =  LR;\n";
     PrintDot(dot_header);
+
+    DotSetGraph("lightgreen", 1.3, 0.5, "rounded", "green", 2.);
+    DotSetEdge("darkgrey", "onormal", 1., 1.2);
 
     // General list information
     PrintDot("List_Inform [shape = record, color = purple, style = solid, label = \"linear:%s | free:%d | size:%d | capacity: %d\"]\n\n",\
@@ -577,7 +576,7 @@ int ListGraph(List *list) {
     PrintDot("Null -> node%d\n", Null_Node);
 
     DotEndGraph(dot_file);
-    PrintGraph(file, list->Dump_Number);
+    DotPrintGraph(file, list->Dump_Number);
 
     list->Dump_Number++;
     return list->Dump_Number;

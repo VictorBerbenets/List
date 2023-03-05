@@ -8,19 +8,23 @@
     char file[Name_Size] = file_name;      \
     FILE* dot_file = fopen(file, "w+");     
 
-#define SetRankdir(dir) fprintf(dot_file, "rankdir = %s", #dir);
+#define DotSetRankdir(dir) fprintf(dot_file, "rankdir = %s\n", #dir);
 
-#define DotSetGraph(GraphStyle) fprintf(dot_file, "%s", #GraphStyle)
+#define DotSetGraph(fillcolor, ranksep, nodesep, style, color, penwidth) \
+    fprintf(dot_file, "graph [fillcolor = %s, ranksep = %lg, nodesep = %lg, style = \"%s\", color = %s, penwidth = %lg];\n",\
+    fillcolor, ranksep, nodesep, style, color, penwidth);
 
-#define DotSetEdge(SetStyle) fprintf(dot_file, "%s", #SetStyle)
+#define DotSetEdge(color, arrowhead, arrowsize, penwidth) \
+    fprintf(dot_file, "edge [color = %s, arrowhead = %s, arrowsize = %lg, penwidth = %lg];\n", color, arrowhead, arrowsize,\
+    penwidth);
 
 #define DotSetNodeStyle(shape, style, fillcolor, fontcolor, margin) \
-    fprintf(dot_file, "node [shape=%s, style=%s, fillcolor=%s, fontcolor=%s, margin = %s];", \
+    fprintf(dot_file, "node [shape=%s, style=%s, fillcolor=%s, fontcolor=%s, margin = %s];\n", \
     #shape, #style, #fillcolor, #fontcolor, #margin);
 
-#define DotSetNode(node_name, shape, style, fillcolor, fontcolor, margin) \
-    fprintf(dot_file, "node [shape=%s, style=%s, fillcolor=%s, fontcolor=%s, margin = %s];", \
-    #shape, #style, #fillcolor, #fontcolor, #margin);
+#define DotSetNode(node_id, shape, style, fillcolor, label) \
+    fprintf(dot_file, "node%d [shape=%s, style=%s, fillcolor=%s, label = %s];\n", \
+    node_id, shape, style, fillcolor, label);
 
 #define DotSetLinkStyle()
 
@@ -31,7 +35,7 @@
     DotPrint("}")                               \
     fclose(file_name);                     
 
-#define PrintGraph(file, picture_numb)                                              \
+#define DotPrintGraph(file, picture_numb)                                              \
     const int dot_len = 150;                                                         \
     char dot_png[dot_len] = "";                                                       \
     sprintf(dot_png, "dot -Tpng %s -o data//graph_%d.png", file, picture_numb);        \
