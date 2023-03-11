@@ -2,7 +2,7 @@
 
 // graphviz
 
-int ListPushTail(List *list, elem_t value) {
+elem_t ListPushTail(List *list, elem_t value) {
 
     if (list->size >= list->capacity) {
         ListResize(list, list->size + AdditionalMemory);
@@ -19,7 +19,7 @@ int ListPushTail(List *list, elem_t value) {
     list->data[list->tail].next = new_tail_id;
     list->tail = new_tail_id;
 
-    FindFreeNode();
+    FindFreeNode(list);
 
     list->data[list->tail].next = 0;
 
@@ -28,7 +28,7 @@ int ListPushTail(List *list, elem_t value) {
     return value;
 }
 
-int ListPushHead(List *list, elem_t value) {
+elem_t ListPushHead(List *list, elem_t value) {
 
     if (list->size >= list->capacity) {
         ListResize(list, list->size + AdditionalMemory);
@@ -48,7 +48,7 @@ int ListPushHead(List *list, elem_t value) {
 
     list->data[list->head].prev = list->free_node;
 
-    FindFreeNode();
+    FindFreeNode(list);
 
     list->data[new_head_id].next = list->head;
     list->head = new_head_id;
@@ -58,7 +58,12 @@ int ListPushHead(List *list, elem_t value) {
     return value;
 }
 
-int ListPushRight(List *list, int node_id, elem_t value) {
+inline void FindFreeNode(List* list) {
+
+    list->free_node = list->data[list->free_node].next;
+}
+
+elem_t ListPushRight(List *list, int node_id, elem_t value) {
 
     if (node_id <= 0 || node_id >= list->capacity) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
@@ -87,7 +92,7 @@ int ListPushRight(List *list, int node_id, elem_t value) {
 
     list->data[new_elem_id].number = value;
 
-    FindFreeNode();
+    FindFreeNode(list);
 
     list->data[new_elem_id].next = node_id_neighbour;
     list->data[node_id_neighbour].prev = new_elem_id;
@@ -100,7 +105,7 @@ int ListPushRight(List *list, int node_id, elem_t value) {
     return value;
 }
 
-int ListPushLeft(List *list, int node_id, elem_t value) {
+elem_t ListPushLeft(List *list, int node_id, elem_t value) {
 
     if (node_id <= 0 || node_id >= list->capacity) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
@@ -213,7 +218,7 @@ void ClearList(List *list) {
     list->head = 0;
 
     list->size--;
-    ListLinerize(list);
+    ListLinearize(list);
 }
 
 void DeleteNode(List *list, int node_id) {
@@ -263,7 +268,7 @@ void AddFreeNodeAfterDelete(List *list, int node_id) {
     list->data[node_id].prev = list->data[old_free_node].prev;
 }
 
-int ListLinerize(List *list) {
+int ListLinearize(List *list) {
 
     if (list->list_is_linear == true) {
 
@@ -290,14 +295,12 @@ int ListLinerize(List *list) {
         new_data[node_counter].prev = node_counter - 1;
         new_data[node_counter].number = list->data[list_ptr].number;
         new_data[node_counter].next = node_counter + 1;
-
     }
     for (node_counter = list->size; node_counter < list->capacity; node_counter++) {
 
         new_data[node_counter].prev = node_counter - 1;
         new_data[node_counter].number = Free_Node;
         new_data[node_counter].next = node_counter + 1;
-
     }
 
     new_data[list->tail].next = 0;                      // tail.next points to null element
@@ -313,13 +316,12 @@ int ListLinerize(List *list) {
 
     free(list->data);
     list->data = new_data;
-
     list->list_is_linear = true;
 
     return 0;
 }
 
-List ListResize(List *list, int new_capacity)
+List ListResize(List *list, int new_capacity) //1 argument, increase size by const
 {
 
     if (new_capacity < list->size) {
@@ -327,7 +329,7 @@ List ListResize(List *list, int new_capacity)
                 __PRETTY_FUNCTION__, __LINE__);
     }
     if (!list->list_is_linear) {
-        ListLinerize(list);
+        ListLinearize(list);
         list->list_is_linear = true;
     }
     
@@ -364,10 +366,13 @@ List ListResize(List *list, int new_capacity)
 
 void ListCtor(List *list, int capacity, int line, const char *func, const char *file) {
 
+    if (capacity <= 0) {
+        capacity = AdditionalMemory;
+    }
     list->capacity = capacity;
 
     list->data = (node *)calloc(capacity, sizeof(node));
-    Validator(list->data == nullptr, "in calloc: couldn't give memory", PrintFuncPosition(); exit(EXIT_FAILURE););
+    Validator(list->data == nullptr, "in calloc: couldn't give memory", PrintFuncPosition(stderr); exit(EXIT_FAILURE););
 
     list->data[0].prev = Null_Elem;
     list->data[0].number = 0;
@@ -395,7 +400,10 @@ void ListCtor(List *list, int capacity, int line, const char *func, const char *
 }
 
 void ListDtor(List *list, int line, const char *func, const char *file) {
-
+    
+    if (!list) {
+        return ;
+    }
     list->tail = 0;
     list->size = 0;
 
@@ -408,76 +416,44 @@ void ListDtor(List *list, int line, const char *func, const char *file) {
     list->Dump_Number    = 0;
     list->list_is_linear = 0;
 
-    free(list->data);
-    list->data = nullptr;
+    if (list->data) {
+        free(list->data);
+        list->data = nullptr;
+    }
 }
 
-void PrintElementInfo(List *list, int elem_id) {
+void ListInform(List *list, const char* text, int line, const char *func, const char *file) {
 
-    if (elem_id < 0 || elem_id >= list->capacity) {
-        fprintf(stderr, "" Red "error: " Grey " there is not element with such index in the list\n");
-        return;
-    }
-    Validator((elem_id < 0 || elem_id >= list->capacity), "invalid elem index"; PrintFuncPosition(); return;);
+    FILE* list_log = fopen("data//list_log.html", "a");
+    Validator(list_log == 0, in opening file, PrintFuncPosition(stderr););
+    PrintLog("<pre>\n");
+    PrintLog("-----------------------------------List Dump--------------------------------------------------\n");
 
-    fprintf(stderr, "\t\t" Purple Blinking "Element Dump" Grin "\n");
-    fprintf(stderr, "prev index: %d\n", list->data[elem_id].prev);
-    fprintf(stderr, "index:      %d\n", elem_id);
-    fprintf(stderr, "next index: %d\n", list->data[elem_id].next);
-    fprintf(stderr, "value:      %lg\n" Grey "", list->data[elem_id].number);
-}
-
-void ListInform(List *list, int line, const char *func, const char *file) {
-
-    PrintListDump();
-    PrintFuncPosition();
-
-    fprintf(stderr, "\n");
-    fprintf(stderr, "list data ptr    =  %p\n", list->data);
-    fprintf(stderr, "list head        =  %d\n", list->head);
-    fprintf(stderr, "list tail        =  %d\n", list->tail);
-    fprintf(stderr, "list capacity    =  %d\n", list->capacity);
-    fprintf(stderr, "list size        =  %d\n", list->size);
-    fprintf(stderr, "list free node   =  %d\n\n", list->free_node);
-
-    fprintf(stderr, "list elemenst from 'head' to 'tail' in order:\n");
-    PrintBlueLine()
-
-    int data_num = 1;
-    int elem_id = list->head;
-
-    for (; data_num < list->size; data_num++, elem_id = list->data[elem_id].next) {
-        fprintf(stderr, "[%d] = %lg\n", data_num, list->data[elem_id].number);
-    }
-
-    fprintf(stderr, "*[%d] = %lg <------ End of list\n", data_num, list->data[elem_id].number);
-    PrintBlueLine()
-
-        fprintf(stderr, "list elemenst from 'tail' to 'head' in order:\n");
-
-    data_num = 1;
-    elem_id = list->tail;
-
-    for (; data_num < list->size; data_num++, elem_id = list->data[elem_id].prev) {
-        fprintf(stderr, "[%d] = %lg\n", data_num, list->data[elem_id].number);
-    }
-
-    fprintf(stderr, "*[%d] = %lg <------ End of list\n", data_num, list->data[elem_id].number);
-    PrintListDumpEnd();
+    PrintLog("head:%d,\ttail:%d,\tfree node:%d;\ncapacity:%d,\tsize:%d\n", list->head, list->tail, \
+    list->free_node, list->capacity, list->size);
+    PrintLog("Action with list: %s", text);
+    PrintFuncPosition(list_log);
 
     ListGraph(list);
+    PrintLog("<img src=\"../data/graph_%d.png\" width = \"2000px\" height = \"400px\">\n", list->Dump_Number);
+    PrintLog("---------------------------------------End----------------------------------------------\n\n");
+
+    list->Dump_Number++;
+
+    char is_file_closed = fclose(list_log);
+    Validator(is_file_closed != 0, in closing file, PrintFuncPosition(stderr););
 }
 
 int ListGraph(List *list) {
 
     DotStartGraph("data//list.dot");
-    Validator(dot_file == nullptr, in openning file:'data//list.dot', return OPEN_FILE_ERROR;);
+    Validator(dot_file == nullptr, in opening file:'data//list.dot', return OPEN_FILE_ERROR;);
 
     const char dot_header[] = "digraph List {\n"
                               "\tdpi = 100;\n"
                               "\tfontname = \"Comic Sans MS\";\n"
                               "\tfontsize = 20;\n"
-                              "\trankdir   =  LR;\n";
+                              "\trankdir  = LR;\n";
     PrintDot(dot_header);
 
     DotSetGraph("lightgreen", 1.3, 0.5, "rounded", "green", 2.);
@@ -489,7 +465,6 @@ int ListGraph(List *list) {
 
     PrintDot("node%d [shape = record, color = brown, style = solid, label = \"node_id:%d|<p> prev:%d| value:%d|<n>next:%d\"]\n",
              0, 0, Null_Node, Null_Elem, Null_Node);
-    // PrintDot("Nothing -> node%d\n", Null_Node);
 
     for (int phys_node_id = 1; phys_node_id < list->capacity; phys_node_id++)
     {
@@ -498,13 +473,11 @@ int ListGraph(List *list) {
         {
             PrintDot("node%d [shape = record, color = red, style = solid, label = \"node_id:%d|<p> prev:%d| value:%lg|<n>next:%d\"]\n",
                      phys_node_id, phys_node_id, list->data[phys_node_id].prev, list->data[phys_node_id].number, list->data[phys_node_id].next);
-            // PrintDot("Head -> node%d\n", phys_node_id);
         }
         if (phys_node_id == list->tail)
         {
             PrintDot("node%d [shape = record, color = red, style = solid, label = \"node_id:%d|<p> prev:%d| value:%lg|<n>next:%d\"]\n",
                      phys_node_id, phys_node_id, list->data[phys_node_id].prev, list->data[phys_node_id].number, list->data[phys_node_id].next);
-            // PrintDot("Tail -> node%d\n", phys_node_id);
         }
         if (phys_node_id != list->head && phys_node_id != list->tail)
         {
@@ -578,6 +551,5 @@ int ListGraph(List *list) {
     DotEndGraph(dot_file);
     DotPrintGraph(file, list->Dump_Number);
 
-    list->Dump_Number++;
     return list->Dump_Number;
 }

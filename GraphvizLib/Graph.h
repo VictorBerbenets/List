@@ -22,20 +22,21 @@
     fprintf(dot_file, "node [shape=%s, style=%s, fillcolor=%s, fontcolor=%s, margin = %s];\n", \
     #shape, #style, #fillcolor, #fontcolor, #margin);
 
-#define DotSetNode(node_id, shape, style, fillcolor, label) \
-    fprintf(dot_file, "node%d [shape=%s, style=%s, fillcolor=%s, label = %s];\n", \
-    node_id, shape, style, fillcolor, label);
+#define DotSetNode(node_id, shape, style, color, label) \
+    fprintf(dot_file, "node%d [shape=%s, style=%s, color=%s, label = %s];\n", \
+    node_id, shape, style, color, label);
 
 #define DotSetLinkStyle()
 
-#define DotCreateNode()
+#define DotCreateConnection(first_id, second_id) \
+    fprintf(dot_file, "node%d -> node%d\n", first_id, second_id);
 
 
 #define DotEndGraph(file_name)                 \
     DotPrint("}")                               \
     fclose(file_name);                     
 
-#define DotPrintGraph(file, picture_numb)                                              \
+#define DotPrintGraph(file, picture_numb)                                           \
     const int dot_len = 150;                                                         \
     char dot_png[dot_len] = "";                                                       \
     sprintf(dot_png, "dot -Tpng %s -o data//graph_%d.png", file, picture_numb);        \
