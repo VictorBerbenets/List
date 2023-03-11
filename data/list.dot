@@ -5,33 +5,73 @@ digraph List {
 	rankdir  = LR;
 graph [fillcolor = lightgreen, ranksep = 1.3, nodesep = 0.5, style = "rounded", color = green, penwidth = 2];
 edge [color = darkgrey, arrowhead = onormal, arrowsize = 1, penwidth = 1.2];
-List_Inform [shape = record, color = purple, style = solid, label = "linear:true | free:10 | size:10 | capacity: 15"]
+List_Inform [shape = record, color = yellow, style = solid, label = "linear:true | free:10 | size:10 | capacity: 55"]
 
 node0 [shape = record, color = brown, style = solid, label = "node_id:0|<p> prev:0| value:0|<n>next:0"]
 node1 [shape = record, color = red, style = solid, label = "node_id:1|<p> prev:0| value:6000|<n>next:2"]
-node2 [shape = record, color = green, style = solid, label = "node_id:2|<p> prev:1| value:2200|<n>next:3"]
-node3 [shape = record, color = green, style = solid, label = "node_id:3|<p> prev:2| value:2150|<n>next:4"]
-node4 [shape = record, color = green, style = solid, label = "node_id:4|<p> prev:3| value:2700|<n>next:5"]
-node5 [shape = record, color = green, style = solid, label = "node_id:5|<p> prev:4| value:2000|<n>next:6"]
-node6 [shape = record, color = green, style = solid, label = "node_id:6|<p> prev:5| value:2100|<n>next:7"]
-node7 [shape = record, color = green, style = solid, label = "node_id:7|<p> prev:6| value:3000|<n>next:8"]
+node2 [shape = record, color = green, style = solid, label = "node_id:2|<p> prev:1| value:1488|<n>next:3"]
+node3 [shape = record, color = green, style = solid, label = "node_id:3|<p> prev:2| value:2100|<n>next:4"]
+node4 [shape = record, color = green, style = solid, label = "node_id:4|<p> prev:3| value:2100|<n>next:5"]
+node5 [shape = record, color = green, style = solid, label = "node_id:5|<p> prev:4| value:2100|<n>next:6"]
+node6 [shape = record, color = green, style = solid, label = "node_id:6|<p> prev:5| value:3000|<n>next:7"]
+node7 [shape = record, color = green, style = solid, label = "node_id:7|<p> prev:6| value:4000|<n>next:8"]
 node8 [shape = record, color = green, style = solid, label = "node_id:8|<p> prev:7| value:5000|<n>next:9"]
 node9 [shape = record, color = red, style = solid, label = "node_id:9|<p> prev:8| value:7000|<n>next:0"]
-node10 [shape = record, color = green, style = solid, label = "node_id:10|<p> prev:9| value:5.59022e+08|<n>next:11"]
-node11 [shape = record, color = green, style = solid, label = "node_id:11|<p> prev:10| value:5.59022e+08|<n>next:12"]
-node12 [shape = record, color = green, style = solid, label = "node_id:12|<p> prev:11| value:5.59022e+08|<n>next:13"]
-node13 [shape = record, color = green, style = solid, label = "node_id:13|<p> prev:12| value:5.59022e+08|<n>next:14"]
-node14 [shape = record, color = green, style = solid, label = "node_id:14|<p> prev:13| value:5.59022e+08|<n>next:14"]
+node10 [shape = record, color = purple, style = solid, label = "node_id:10|<p> prev:9| value:5.59022e+08|<n>next:11"]
+node11 [shape = record, color = purple, style = solid, label = "node_id:11|<p> prev:10| value:5.59022e+08|<n>next:12"]
+node12 [shape = record, color = purple, style = solid, label = "node_id:12|<p> prev:11| value:5.59022e+08|<n>next:13"]
+node13 [shape = record, color = purple, style = solid, label = "node_id:13|<p> prev:12| value:5.59022e+08|<n>next:14"]
+node14 [shape = record, color = purple, style = solid, label = "node_id:14|<p> prev:13| value:5.59022e+08|<n>next:15"]
+node15 [shape = record, color = purple, style = solid, label = "node_id:15|<p> prev:14| value:5.59022e+08|<n>next:16"]
+node16 [shape = record, color = purple, style = solid, label = "node_id:16|<p> prev:15| value:5.59022e+08|<n>next:17"]
+node17 [shape = record, color = purple, style = solid, label = "node_id:17|<p> prev:16| value:5.59022e+08|<n>next:18"]
+node18 [shape = record, color = purple, style = solid, label = "node_id:18|<p> prev:17| value:5.59022e+08|<n>next:19"]
+node19 [shape = record, color = purple, style = solid, label = "node_id:19|<p> prev:18| value:5.59022e+08|<n>next:20"]
+node20 [shape = record, color = purple, style = solid, label = "node_id:20|<p> prev:19| value:5.59022e+08|<n>next:21"]
+node21 [shape = record, color = purple, style = solid, label = "node_id:21|<p> prev:20| value:5.59022e+08|<n>next:22"]
+node22 [shape = record, color = purple, style = solid, label = "node_id:22|<p> prev:21| value:5.59022e+08|<n>next:23"]
+node23 [shape = record, color = purple, style = solid, label = "node_id:23|<p> prev:22| value:5.59022e+08|<n>next:24"]
+node24 [shape = record, color = purple, style = solid, label = "node_id:24|<p> prev:23| value:5.59022e+08|<n>next:25"]
+node25 [shape = record, color = purple, style = solid, label = "node_id:25|<p> prev:24| value:5.59022e+08|<n>next:26"]
+node26 [shape = record, color = purple, style = solid, label = "node_id:26|<p> prev:25| value:5.59022e+08|<n>next:27"]
+node27 [shape = record, color = purple, style = solid, label = "node_id:27|<p> prev:26| value:5.59022e+08|<n>next:28"]
+node28 [shape = record, color = purple, style = solid, label = "node_id:28|<p> prev:27| value:5.59022e+08|<n>next:29"]
+node29 [shape = record, color = purple, style = solid, label = "node_id:29|<p> prev:28| value:5.59022e+08|<n>next:30"]
+node30 [shape = record, color = purple, style = solid, label = "node_id:30|<p> prev:29| value:5.59022e+08|<n>next:31"]
+node31 [shape = record, color = purple, style = solid, label = "node_id:31|<p> prev:30| value:5.59022e+08|<n>next:32"]
+node32 [shape = record, color = purple, style = solid, label = "node_id:32|<p> prev:31| value:5.59022e+08|<n>next:33"]
+node33 [shape = record, color = purple, style = solid, label = "node_id:33|<p> prev:32| value:5.59022e+08|<n>next:34"]
+node34 [shape = record, color = purple, style = solid, label = "node_id:34|<p> prev:33| value:5.59022e+08|<n>next:35"]
+node35 [shape = record, color = purple, style = solid, label = "node_id:35|<p> prev:34| value:5.59022e+08|<n>next:36"]
+node36 [shape = record, color = purple, style = solid, label = "node_id:36|<p> prev:35| value:5.59022e+08|<n>next:37"]
+node37 [shape = record, color = purple, style = solid, label = "node_id:37|<p> prev:36| value:5.59022e+08|<n>next:38"]
+node38 [shape = record, color = purple, style = solid, label = "node_id:38|<p> prev:37| value:5.59022e+08|<n>next:39"]
+node39 [shape = record, color = purple, style = solid, label = "node_id:39|<p> prev:38| value:5.59022e+08|<n>next:40"]
+node40 [shape = record, color = purple, style = solid, label = "node_id:40|<p> prev:39| value:5.59022e+08|<n>next:41"]
+node41 [shape = record, color = purple, style = solid, label = "node_id:41|<p> prev:40| value:5.59022e+08|<n>next:42"]
+node42 [shape = record, color = purple, style = solid, label = "node_id:42|<p> prev:41| value:5.59022e+08|<n>next:43"]
+node43 [shape = record, color = purple, style = solid, label = "node_id:43|<p> prev:42| value:5.59022e+08|<n>next:44"]
+node44 [shape = record, color = purple, style = solid, label = "node_id:44|<p> prev:43| value:5.59022e+08|<n>next:45"]
+node45 [shape = record, color = purple, style = solid, label = "node_id:45|<p> prev:44| value:5.59022e+08|<n>next:46"]
+node46 [shape = record, color = purple, style = solid, label = "node_id:46|<p> prev:45| value:5.59022e+08|<n>next:47"]
+node47 [shape = record, color = purple, style = solid, label = "node_id:47|<p> prev:46| value:5.59022e+08|<n>next:48"]
+node48 [shape = record, color = purple, style = solid, label = "node_id:48|<p> prev:47| value:5.59022e+08|<n>next:49"]
+node49 [shape = record, color = purple, style = solid, label = "node_id:49|<p> prev:48| value:5.59022e+08|<n>next:50"]
+node50 [shape = record, color = purple, style = solid, label = "node_id:50|<p> prev:49| value:5.59022e+08|<n>next:51"]
+node51 [shape = record, color = purple, style = solid, label = "node_id:51|<p> prev:50| value:5.59022e+08|<n>next:52"]
+node52 [shape = record, color = purple, style = solid, label = "node_id:52|<p> prev:51| value:5.59022e+08|<n>next:53"]
+node53 [shape = record, color = purple, style = solid, label = "node_id:53|<p> prev:52| value:5.59022e+08|<n>next:54"]
+node54 [shape = record, color = purple, style = solid, label = "node_id:54|<p> prev:53| value:5.59022e+08|<n>next:54"]
 
 
 
-edge[style=invis, constraint = true]node0 -> node1 -> node2 -> node3 -> node4 -> node5 -> node6 -> node7 -> node8 -> node9 -> node10 -> node11 -> node12 -> node13 -> node14 -> node14 
+edge[style=invis, constraint = true]node0 -> node1 -> node2 -> node3 -> node4 -> node5 -> node6 -> node7 -> node8 -> node9 -> node10 -> node11 -> node12 -> node13 -> node14 -> node15 -> node16 -> node17 -> node18 -> node19 -> node20 -> node21 -> node22 -> node23 -> node24 -> node25 -> node26 -> node27 -> node28 -> node29 -> node30 -> node31 -> node32 -> node33 -> node34 -> node35 -> node36 -> node37 -> node38 -> node39 -> node40 -> node41 -> node42 -> node43 -> node44 -> node45 -> node46 -> node47 -> node48 -> node49 -> node50 -> node51 -> node52 -> node53 -> node54 -> node54 
 Head -> node1
 Tail -> node9
 Free_Node -> node10
 Null -> node0
 edge[style=solid, constraint = false]node1:p -> node0;node1:n -> node2;node2:p ->node1;node2:n -> node3;node3:p ->node2;node3:n -> node4;node4:p ->node3;node4:n -> node5;node5:p ->node4;node5:n -> node6;node6:p ->node5;node6:n -> node7;node7:p ->node6;node7:n -> node8;node8:p ->node7;node8:n -> node9;node9:p ->node8;node9:n  -> node0
-node10:n -> node11 node11:p ->node10;node11:n -> node12 node12:p ->node11;node12:n -> node13 node13:p ->node12;node13:n -> node14 node14:p ->node13;node14:n  -> node14
+node10:n -> node11 node11:p ->node10;node11:n -> node12 node12:p ->node11;node12:n -> node13 node13:p ->node12;node13:n -> node14 node14:p ->node13;node14:n -> node15 node15:p ->node14;node15:n -> node16 node16:p ->node15;node16:n -> node17 node17:p ->node16;node17:n -> node18 node18:p ->node17;node18:n -> node19 node19:p ->node18;node19:n -> node20 node20:p ->node19;node20:n -> node21 node21:p ->node20;node21:n -> node22 node22:p ->node21;node22:n -> node23 node23:p ->node22;node23:n -> node24 node24:p ->node23;node24:n -> node25 node25:p ->node24;node25:n -> node26 node26:p ->node25;node26:n -> node27 node27:p ->node26;node27:n -> node28 node28:p ->node27;node28:n -> node29 node29:p ->node28;node29:n -> node30 node30:p ->node29;node30:n -> node31 node31:p ->node30;node31:n -> node32 node32:p ->node31;node32:n -> node33 node33:p ->node32;node33:n -> node34 node34:p ->node33;node34:n -> node35 node35:p ->node34;node35:n -> node36 node36:p ->node35;node36:n -> node37 node37:p ->node36;node37:n -> node38 node38:p ->node37;node38:n -> node39 node39:p ->node38;node39:n -> node40 node40:p ->node39;node40:n -> node41 node41:p ->node40;node41:n -> node42 node42:p ->node41;node42:n -> node43 node43:p ->node42;node43:n -> node44 node44:p ->node43;node44:n -> node45 node45:p ->node44;node45:n -> node46 node46:p ->node45;node46:n -> node47 node47:p ->node46;node47:n -> node48 node48:p ->node47;node48:n -> node49 node49:p ->node48;node49:n -> node50 node50:p ->node49;node50:n -> node51 node51:p ->node50;node51:n -> node52 node52:p ->node51;node52:n -> node53 node53:p ->node52;node53:n -> node54 node54:p ->node53;node54:n  -> node54
 Head -> node1
 Tail -> node9
 Free_Node -> node10

@@ -22,7 +22,6 @@ elem_t ListPushTail(List *list, elem_t value) {
     FindFreeNode(list);
 
     list->data[list->tail].next = 0;
-
     list->size++;
 
     return value;
@@ -321,46 +320,57 @@ int ListLinearize(List *list) {
     return 0;
 }
 
-List ListResize(List *list, int new_capacity) //1 argument, increase size by const
-{
+List ListResize(List *list, int new_capacity) { //1 argument, increase size by const
 
     if (new_capacity < list->size) {
-        fprintf(stderr, "" White "%s:%d:" Purple "Warning:" Grey "good job, fucker: you just erased some list's data: \n",
-                __PRETTY_FUNCTION__, __LINE__);
+        fprintf(stderr, "" White "%s:%d:" Purple "Warning:" Grey "good job, fucker: you just could erased some list's data but I saved "
+        "your black ass \n", __PRETTY_FUNCTION__, __LINE__);
+        return *list;
     }
-    if (!list->list_is_linear) {
-        ListLinearize(list);
-        list->list_is_linear = true;
-    }
-    
-    list->data = (node *)realloc(list->data, new_capacity * sizeof(node));
-    Validator(list->data == nullptr, "in realloc: couldn't give memory", exit(EXIT_FAILURE););
+    node* new_data = (node*) calloc(new_capacity, sizeof(node));
+    Validator(new_data == nullptr, "in calloc: couldn't give memory", exit(EXIT_FAILURE););
 
-    if (new_capacity > list->capacity) {
+    int node_id      = list->head;
+    int node_counter = 0;
+    new_data[node_counter].prev   = Null_Node;
+    new_data[node_counter].number = Null_Node;
+    new_data[node_counter].next   = Null_Node;
 
-        int node_id = list->capacity;
-        for (; node_id < new_capacity; node_id++) {
-            list->data[node_id].prev = node_id - 1;
-            list->data[node_id].number = Free_Node;
-            list->data[node_id].next = node_id + 1;
-        }
-
-        list->data[node_id - 1].next = node_id - 1;
-        list->free_node = list->capacity;
-    }
-    else if (list->size < new_capacity) {
-        list->data[new_capacity - 1].next = new_capacity - 1;
-        list->free_node = list->size;
+    if (new_capacity != ListInitSize) { //set head
+        list->head = 1;
     }
     else {
-        list->size = new_capacity;
-        list->tail = new_capacity - 1;
-        list->data[list->tail].next = 0;
-        list->free_node = new_capacity;
+        list->head = 0;
     }
 
-    list->capacity = new_capacity;
+    for (node_counter = 1; node_counter < new_capacity; node_counter++, node_id = list->data[node_id].next) {
 
+        if (node_counter < list->size) {
+            new_data[node_counter].number = list->data[node_id].number;
+        }
+        else {
+            new_data[node_counter].number = Free_Node;
+        }
+        new_data[node_counter].prev = node_counter - 1;
+        new_data[node_counter].next = node_counter + 1;
+    }
+
+    if (node_counter > 1) {
+        new_data[node_counter - 1].next = node_counter - 1;
+    }
+    free(list->data);
+    list->data = new_data;
+
+    if (list->size == list->capacity) { //set free
+        list->free_node = list->size;
+        list->data[list->free_node].next = list->size + 1;
+    }
+
+    list->tail = list->size - 1;
+    list->data[list->tail].next = 0;         
+    list->list_is_linear = true;
+    list->capacity       = new_capacity;
+   
     return *list;
 }
 
@@ -374,9 +384,9 @@ void ListCtor(List *list, int capacity, int line, const char *func, const char *
     list->data = (node *)calloc(capacity, sizeof(node));
     Validator(list->data == nullptr, "in calloc: couldn't give memory", PrintFuncPosition(stderr); exit(EXIT_FAILURE););
 
-    list->data[0].prev = Null_Elem;
+    list->data[0].prev   = Null_Elem;
     list->data[0].number = 0;
-    list->data[0].next = Null_Elem;
+    list->data[0].next   = Null_Elem;
 
     list->size = ListInitSize;
     list->tail = Null_Node;
@@ -429,10 +439,10 @@ void ListInform(List *list, const char* text, int line, const char *func, const 
     PrintLog("<pre>\n");
     PrintLog("-----------------------------------List Dump--------------------------------------------------\n");
 
+    PrintFuncPosition(list_log);
     PrintLog("head:%d,\ttail:%d,\tfree node:%d;\ncapacity:%d,\tsize:%d\n", list->head, list->tail, \
     list->free_node, list->capacity, list->size);
     PrintLog("Action with list: %s", text);
-    PrintFuncPosition(list_log);
 
     ListGraph(list);
     PrintLog("<img src=\"../data/graph_%d.png\" width = \"2000px\" height = \"400px\">\n", list->Dump_Number);
@@ -460,7 +470,7 @@ int ListGraph(List *list) {
     DotSetEdge("darkgrey", "onormal", 1., 1.2);
 
     // General list information
-    PrintDot("List_Inform [shape = record, color = purple, style = solid, label = \"linear:%s | free:%d | size:%d | capacity: %d\"]\n\n",\
+    PrintDot("List_Inform [shape = record, color = yellow, style = solid, label = \"linear:%s | free:%d | size:%d | capacity: %d\"]\n\n",\
             list->list_is_linear == true? "true":"false", list->free_node, list->size, list->capacity);
 
     PrintDot("node%d [shape = record, color = brown, style = solid, label = \"node_id:%d|<p> prev:%d| value:%d|<n>next:%d\"]\n",
@@ -481,8 +491,9 @@ int ListGraph(List *list) {
         }
         if (phys_node_id != list->head && phys_node_id != list->tail)
         {
-            PrintDot("node%d [shape = record, color = green, style = solid, label = \"node_id:%d|<p> prev:%d| value:%lg|<n>next:%d\"]\n",
-                     phys_node_id, phys_node_id, list->data[phys_node_id].prev, list->data[phys_node_id].number, list->data[phys_node_id].next);
+            PrintDot("node%d [shape = record, color = %s, style = solid, label = \"node_id:%d|<p> prev:%d| value:%lg|<n>next:%d\"]\n",\
+                     phys_node_id, list->data[phys_node_id].number == Free_Node ? "purple":"green", phys_node_id, list->data[phys_node_id].prev,\
+                     list->data[phys_node_id].number, list->data[phys_node_id].next);
         }
     }
     PrintDot("\n\n\n");

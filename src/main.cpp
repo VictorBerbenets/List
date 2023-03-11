@@ -5,25 +5,35 @@
 int main() {
 
     List list = {};
-    ListConstructor(list, 15);
+    ListConstructor(list, 20);
     char string[MaxStringLen] = {};   
 
-    ListDump(list, "Creating list");
+    ListDump(list, "Creating list\n");
 
     ListPushHead(&list, 1488);
     ListDump(list, "Pushing %lg to head\n", list.data[list.head].number);
+ 
+    ListPushHead(&list, 1488);
+    ListDump(list, "Pushing %lg to head\n", list.data[list.head].number);
 
-    ListPushTail(&list, 2000);
+
+    ListResize(&list, 5);
+    // ListLinearize(&list);
+
+    ListDump(list, "Resizing list\n");
+
+    ListPushTail(&list, 2100);
     ListDump(list, "Pushing %lg to tail\n", list.data[list.tail].number);
 
     ListPushTail(&list, 2100);
     ListDump(list, "Pushing %lg to tail\n", list.data[list.tail].number);
 
-    ListDump(list, "Pushing right after node id: %d value: %lg\n", 1, ListPushRight(&list, 1, 2150));
+    ListPushTail(&list, 2100);
+    ListDump(list, "Pushing %lg to tail\n", list.data[list.tail].number);
 
-    ListDump(list, "Pushing right after node id: %d value: %lg\n", 1, ListPushRight(&list, 1, 2200));
-    
-    ListDump(list, "Pushing left before node id: %d value: %lg\n", 2, ListPushLeft(&list, 2, 2700));
+    ListPushTail(&list, 2100);
+    ListDump(list, "Pushing %lg to tail\n", list.data[list.tail].number);
+
 
     ListPushTail(&list, 3000);
     ListDump(list, "Pushing %lg to tail\n", list.data[list.tail].number);
@@ -31,8 +41,8 @@ int main() {
     ListPushTail(&list, 4000);
     ListDump(list, "Pushing %lg to tail\n", list.data[list.tail].number);
 
-    ListDump(list, "Deleted node with id: %d\n", ListDeleteNode(&list, list.tail));
-    ListDump(list, "Deleted node with id: %d\n", ListDeleteNode(&list, list.head));
+    ListDump(list, "Deleted node with id: %d\n", ListDeleteNode(&list, 2));
+    ListDump(list, "Deleted node with id: %d\n", ListDeleteNode(&list, 3));
 
     ListPushTail(&list, 5000);
     ListDump(list, "Pushing %lg to tail\n", list.data[list.tail].number);
@@ -44,7 +54,7 @@ int main() {
     ListDump(list, "Pushing %lg to tail\n", list.data[list.tail].number);
 
     ListLinearize(&list);
-    ListDump(list, "Linearizing list\n");
+    ListDump(list, "list linearizing\n");
 
     ListDestructor(list);
 
