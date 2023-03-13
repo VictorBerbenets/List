@@ -2,136 +2,142 @@
 
 // graphviz
 
-int ListPushTail(List *list, elem_t value) {
+elem_t List::ListPushTail(List *list, elem_t value) {
 
-    if (list->size >= list->capacity) {
-        ListResize(list, list->size + AdditionalMemory);
+    if (size_ >= capacity_) {
+        ListResize(list, size_ + AdditionalMemory);
     }
 
-    int new_tail_id = list->free_node;
-    list->data[new_tail_id].number = value;
-    list->data[new_tail_id].prev = list->tail;
+    int new_tail_id = free_node_;
+    data_[new_tail_id].number_ = value;
+    data_[new_tail_id].prev_   = tail_;
 
-    if (list->size == ListInitSize) {
-        list->head = new_tail_id;
+    if (size_ == ListInitSize) {
+        head_ = new_tail_id;
     }
 
-    list->data[list->tail].next = new_tail_id;
-    list->tail = new_tail_id;
+    data_[tail_].next_ = new_tail_id;
+    tail_ = new_tail_id;
 
-    FindFreeNode();
+    FindFreeNode(list);
 
-    list->data[list->tail].next = 0;
-
-    list->size++;
+    data_[tail_].next_ = 0;
+    size_ ++;
 
     return value;
 }
 
-int ListPushHead(List *list, elem_t value) {
+elem_t List::ListPushHead(List *list, elem_t value) {
 
-    if (list->size >= list->capacity) {
-        ListResize(list, list->size + AdditionalMemory);
+    if (size_ >= capacity_) {
+        ListResize(list, size_ + AdditionalMemory);
     }
 
-    int new_head_id = list->free_node;
+    list_is_linear_ = false;
+    int new_head_id = free_node_;
 
-    list->data[new_head_id].number = value;
-    list->data[new_head_id].prev = 0;
+    data_[new_head_id].number_ = value;
+    data_[new_head_id].prev_   = 0;
 
-    if (list->size == ListInitSize) {
-        list->tail = new_head_id;
+    if (size_ == ListInitSize) {
+
+        list_is_linear_ = true;
+        tail_           = new_head_id;
     }
 
-    list->data[list->head].prev = list->free_node;
+    data_[head_].prev_ = free_node_;
 
-    FindFreeNode();
+    FindFreeNode(list);
 
-    list->data[new_head_id].next = list->head;
-    list->head = new_head_id;
+    data_[new_head_id].next_ = head_;
+    head_ = new_head_id;
 
-    list->size++;
-    list->list_is_linear = false;
+    size_++;
 
     return value;
 }
 
-int ListPushRight(List *list, int node_id, elem_t value) {
+inline void List::FindFreeNode(List* list) {
 
-    if (node_id <= 0 || node_id >= list->capacity) {
+    free_node_ = data_[free_node_].next_;
+}
+
+elem_t List::ListPushRight(List *list, int node_id, elem_t value) {
+
+    if (node_id <= 0 || node_id >= capacity_) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
         return INVALID_NODE_ID;
     }
 
-    if (list->data[node_id].number == Free_Node) {
+    if (data_[node_id].number_ == Free_Node) {
 
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id. This elem is not a part of the list: %d\n",
                 __PRETTY_FUNCTION__, __LINE__, node_id);
         return INVALID_NODE_ID;
     }
 
-    if (list->size >= list->capacity) {
-        ListResize(list, list->size + AdditionalMemory);
+    if (size_ >= capacity_) {
+        ListResize(list, size_ + AdditionalMemory);
     }
 
-    if (list->size == ListInitSize || node_id == list->tail) {
+    if (size_ == ListInitSize || node_id == tail_) {
 
         return ListPushTail(list, value);
     }
 
 
-    int new_elem_id = list->free_node;
-    int node_id_neighbour = list->data[node_id].next;
+    int new_elem_id = GetFree();
+    int node_id_neighbour = data_[node_id].next_;
 
-    list->data[new_elem_id].number = value;
+    data_[new_elem_id].number_ = value;
 
-    FindFreeNode();
+    FindFreeNode(list);
 
-    list->data[new_elem_id].next = node_id_neighbour;
-    list->data[node_id_neighbour].prev = new_elem_id;
-    list->data[node_id].next = new_elem_id;
-    list->data[new_elem_id].prev = node_id;
+    data_[new_elem_id].next_ = node_id_neighbour;
+    data_[node_id_neighbour].prev_ = new_elem_id;
+    data_[node_id].next_ = new_elem_id;
+    data_[new_elem_id].prev_ = node_id;
 
-    list->size++;
-    list->list_is_linear = false;
+    size_++;
+    list_is_linear_ = false;
 
     return value;
 }
 
-int ListPushLeft(List *list, int node_id, elem_t value) {
+elem_t List::ListPushLeft(List *list, int node_id, elem_t value) {
 
-    if (node_id <= 0 || node_id >= list->capacity) {
+    if (node_id <= 0 || node_id >= capacity_) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id: %d\n", __PRETTY_FUNCTION__, __LINE__, node_id);
         return INVALID_NODE_ID;
     }
 
-    if (list->data[node_id].number == Free_Node) {
+    if (data_[node_id].number_ == Free_Node) {
 
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey "invalid node id. This elem is not a part of the list: %d\n",
                 __PRETTY_FUNCTION__, __LINE__, node_id);
         return INVALID_NODE_ID;
     }
 
-    if (list->size >= list->capacity) {
-        ListResize(list, list->size + AdditionalMemory);
+    if (size_ >= capacity_) {
+        ListResize(list, size_ + AdditionalMemory);
     }
 
-    if (list->size == ListInitSize || node_id == list->head) {
+    if (size_ == ListInitSize || node_id == head_) {
 
         return ListPushHead(list, value);
     }
 
-    int left_neighbour = list->data[node_id].prev;
+    int left_neighbour = data_[node_id].prev_;
 
     return ListPushRight(list, left_neighbour, value);
 }
 
-int FindFirstListElem(List *list, elem_t value) {
+int List::FindFirstListElem(List *list, elem_t value) {
 
-    int node_id = list->head;
-    for (int node_counter = 1; node_counter < list->size; node_counter++, node_id = list->data[node_id].next) {
+    int node_id = head_;
+    for (int node_counter = 1; node_counter < size_; node_counter++, node_id = data_[node_id].next_) {
 
-        if (list->data[node_id].number == value) {
+        if (data_[node_id].number_ == value) {
             return node_id;
         }
     }
@@ -139,59 +145,59 @@ int FindFirstListElem(List *list, elem_t value) {
     return -1;
 }
 
-int FindPhysAddress(List *list, int logic_id) {
+int List::FindPhysAddress(List *list, int logic_id) {
 
-    if (list->size == ListInitSize || logic_id <= 0 || logic_id > list->size) {
+    if (size_ == ListInitSize || logic_id <= 0 || logic_id > size_) {
         return INVALID_LOGIC_ID;
     }
     if (logic_id == FirstListElem) {
-        return list->head;
+        return head_;
     }
 
-    int current_node_id = list->head;
+    int current_node_id = head_;
     for (int node_counter = 1; node_counter < logic_id; node_counter++) {
 
-        current_node_id = list->data[current_node_id].next;
+        current_node_id = data_[current_node_id].next_;
     }
 
     return current_node_id;
 }
 
-int FindLogicAddress(List *list, int phys_id) {
+int List::FindLogicAddress(List *list, int phys_id) {
 
-    if (list->size == ListInitSize || phys_id <= 0 || phys_id >= list->capacity) {
+    if (size_ == ListInitSize || phys_id <= 0 || phys_id >= capacity_) {
         return INVALID_LOGIC_ID;
     }
 
-    int current_node_id = list->head;
+    int current_node_id = head_;
     int node_counter = 1;
-    for (; current_node_id != phys_id && node_counter != list->size; node_counter++) {
+    for (; current_node_id != phys_id && node_counter != size_; node_counter++) {
 
-        current_node_id = list->data[current_node_id].next;
+        current_node_id = data_[current_node_id].next_;
     }
 
     return node_counter;
 }
 
-int ListDeleteNode(List *list, int node_id) {
+int List::ListDeleteNode(List *list, int node_id) {
 
     int node_id_neighbour = 0;
-    if (list->size <= 1 || list->size > list->capacity - 1) {
+    if (node_id < 1 || node_id > capacity_ - 1) {
         fprintf(stderr, "" White "%s:%d:" Red " error:" Grey " can't delete this node\n", __PRETTY_FUNCTION__, __LINE__);
         return INVALID_NODE_ID;
     }
 
-    if (list->size == ListInitSize + 1) {
+    if (size_ == ListInitSize + 1) {
         ClearList(list);
         return ListIsCleared;
     }
 
-    else if (node_id == list->tail) {
+    else if (node_id == tail_) {
 
         DeleteTail(list, node_id);
     }
 
-    else if (node_id == list->head) {
+    else if (node_id == head_) {
 
         DeleteHead(list, node_id);
     }
@@ -200,351 +206,268 @@ int ListDeleteNode(List *list, int node_id) {
         DeleteNode(list, node_id);
     }
 
-    list->size--;
+    size_--;
 
     return node_id;
 }
 
-void ClearList(List *list) {
+void List::ClearList(List *list) {
 
-    list->tail = 0;
-    list->head = 0;
+    tail_ = 0;
+    head_ = 0;
 
-    list->size--;
-    ListLinerize(list);
+    size_--;
+    ListLinearize(list);
 }
 
-void DeleteNode(List *list, int node_id) {
+void List::DeleteNode(List *list, int node_id) {
 
-    int right_neighbour = list->data[node_id].next;
-    int left_neighbour = list->data[node_id].prev;
-    list->data[node_id].number = Free_Node;
+    int right_neighbour = data_[node_id].next_;
+    int left_neighbour  = data_[node_id].prev_;
+    data_[node_id].number_ = Free_Node;
 
     AddFreeNodeAfterDelete(list, node_id);
 
-    list->data[right_neighbour].prev = left_neighbour;
-    list->data[left_neighbour].next = right_neighbour;
+    data_[right_neighbour].prev_ = left_neighbour;
+    data_[left_neighbour].next_  = right_neighbour;
 
-    list->list_is_linear = false;
+    list_is_linear_ = false;
 }
 
-void DeleteTail(List *list, int node_id) {
+void List::DeleteTail(List *list, int node_id) {
 
-    int node_id_neighbour = list->data[node_id].prev;
-    list->data[node_id].number = Free_Node;
+    int node_id_neighbour  = data_[node_id].prev_;
+    data_[node_id].number_ = Free_Node;
 
     AddFreeNodeAfterDelete(list, node_id);
 
-    list->tail = node_id_neighbour;
-    list->data[node_id_neighbour].next = 0;
+    tail_ = node_id_neighbour;
+    data_[node_id_neighbour].next_ = 0;
 }
 
-void DeleteHead(List *list, int node_id) {
+void List::DeleteHead(List *list, int node_id) {
 
-    int node_id_neighbour = list->data[node_id].next;
-    list->data[node_id].number = Free_Node;
+    int node_id_neighbour = data_[node_id].next_;
+    data_[node_id].number_ = Free_Node;
 
     AddFreeNodeAfterDelete(list, node_id);
 
-    list->head = node_id_neighbour;
-    list->data[node_id_neighbour].prev = 0;
+    head_ = node_id_neighbour;
+    data_[node_id_neighbour].prev_ = 0;
 }
 
-void AddFreeNodeAfterDelete(List *list, int node_id) {
+void List::AddFreeNodeAfterDelete(List *list, int node_id) {
 
-    int old_free_node = list->free_node;
+    int old_free_node = free_node_;
 
-    list->data[old_free_node].prev = node_id;
-    list->free_node = node_id;
+    data_[old_free_node].prev_ = node_id;
+    free_node_ = node_id;
 
-    list->data[node_id].next = old_free_node;
-    list->data[node_id].prev = list->data[old_free_node].prev;
+    data_[node_id].next_ = old_free_node;
+    data_[node_id].prev_ = data_[old_free_node].prev_;
 }
 
-int ListLinerize(List *list) {
+int List::ListLinearize(List *list) {
 
-    if (list->list_is_linear == true) {
+    if (list_is_linear_ == true) {
 
         return ListIsLinerized;
     }
 
-    node *new_data = (node *)calloc(list->capacity, sizeof(node));
+    node *new_data = new node[capacity_];
     Validator(new_data == nullptr, "calloc could't give memory", return MEM_ALLOCATED_ERR;);
 
-    int list_ptr = list->head;
-    if (list->head) {
-        list->head = 1;
+    int list_ptr = head_;
+    if (head_) {
+        head_ = 1;
     }
 
-    list->tail = list->size - 1;
+    tail_ = size_ - 1;
 
     int node_counter = 0;
-    new_data[node_counter].prev = 0;
-    new_data[node_counter].number = 0;
-    new_data[node_counter].next = 0;
+    new_data[node_counter].prev_   = 0;
+    new_data[node_counter].number_ = 0;
+    new_data[node_counter].next_   = 0;
 
-    for (node_counter = 1; node_counter < list->size; node_counter++, list_ptr = list->data[list_ptr].next) {
+    for (node_counter = 1; node_counter < size_; node_counter++, list_ptr = data_[list_ptr].next_) {
 
-        new_data[node_counter].prev = node_counter - 1;
-        new_data[node_counter].number = list->data[list_ptr].number;
-        new_data[node_counter].next = node_counter + 1;
-
+        new_data[node_counter].prev_   = node_counter - 1;
+        new_data[node_counter].number_ = data_[list_ptr].number_;
+        new_data[node_counter].next_   = node_counter + 1;
     }
-    for (node_counter = list->size; node_counter < list->capacity; node_counter++) {
+    for (node_counter = size_; node_counter < capacity_; node_counter++) {
 
-        new_data[node_counter].prev = node_counter - 1;
-        new_data[node_counter].number = Free_Node;
-        new_data[node_counter].next = node_counter + 1;
-
+        new_data[node_counter].prev_   = node_counter - 1;
+        new_data[node_counter].number_ = Free_Node;
+        new_data[node_counter].next_   = node_counter + 1;
     }
 
-    new_data[list->tail].next = 0;                      // tail.next points to null element
-    new_data[node_counter - 1].next = node_counter - 1; // last free_node points to itself
+    new_data[tail_].next_ = 0;                      // tail.next points to null element
+    new_data[node_counter - 1].next_ = node_counter - 1; // last free_node points to itself
 
-    if (list->size != list->capacity) {
-        list->free_node = list->size;
-        list->data[list->free_node].next = list->size + 1;
+    if (size_ != capacity_) {
+        free_node_ = size_;
+        data_[free_node_].next_ = size_ + 1;
     }
     else {
-        list->free_node = 0;
+        free_node_ = 0;
     }
 
-    free(list->data);
-    list->data = new_data;
-
-    list->list_is_linear = true;
+    delete[] data_;
+    data_ = new_data;
+    list_is_linear_ = true;
 
     return 0;
 }
 
-List ListResize(List *list, int new_capacity)
-{
+void List::ListResize(List *list, int new_capacity) { //1 argument, increase size by const
 
-    if (new_capacity < list->size) {
-        fprintf(stderr, "" White "%s:%d:" Purple "Warning:" Grey "good job, fucker: you just erased some list's data: \n",
-                __PRETTY_FUNCTION__, __LINE__);
+    if (new_capacity < size_) {
+        fprintf(stderr, "" White "%s:%d:" Purple "Warning:" Grey "good job, fucker: you just could erased some list's data but I saved "
+        "your black ass \n", __PRETTY_FUNCTION__, __LINE__);
+        return ;
     }
-    if (!list->list_is_linear) {
-        ListLinerize(list);
-        list->list_is_linear = true;
-    }
-    
-    list->data = (node *)realloc(list->data, new_capacity * sizeof(node));
-    Validator(list->data == nullptr, "in realloc: couldn't give memory", exit(EXIT_FAILURE););
+    node* new_data = new node[new_capacity];
+    Validator(new_data == nullptr, "in calloc: couldn't give memory", exit(EXIT_FAILURE););
 
-    if (new_capacity > list->capacity) {
+    int node_id      = head_;
+    int node_counter = 0;
+    new_data[node_counter].prev_   = Null_Node;
+    new_data[node_counter].number_ = Null_Node;
+    new_data[node_counter].next_   = Null_Node;
 
-        int node_id = list->capacity;
-        for (; node_id < new_capacity; node_id++) {
-            list->data[node_id].prev = node_id - 1;
-            list->data[node_id].number = Free_Node;
-            list->data[node_id].next = node_id + 1;
-        }
-
-        list->data[node_id - 1].next = node_id - 1;
-        list->free_node = list->capacity;
-    }
-    else if (list->size < new_capacity) {
-        list->data[new_capacity - 1].next = new_capacity - 1;
-        list->free_node = list->size;
+    if (new_capacity != ListInitSize) { //set head
+        head_ = 1;
     }
     else {
-        list->size = new_capacity;
-        list->tail = new_capacity - 1;
-        list->data[list->tail].next = 0;
-        list->free_node = new_capacity;
+        head_ = 0;
     }
 
-    list->capacity = new_capacity;
+    for (node_counter = 1; node_counter < new_capacity; node_counter++, node_id = data_[node_id].next_) {
 
-    return *list;
+        if (node_counter < size_) {
+            new_data[node_counter].number_ = data_[node_id].number_;
+        }
+        else {
+            new_data[node_counter].number_ = Free_Node;
+        }
+        new_data[node_counter].prev_ = node_counter - 1;
+        new_data[node_counter].next_ = node_counter + 1;
+    }
+
+    if (node_counter > 1) {
+        new_data[node_counter - 1].next_ = node_counter - 1;
+    }
+    delete[] data_;
+    data_ = new_data;
+
+    if (size_ == capacity_) { //set free
+        free_node_ = size_;
+        data_[free_node_].next_ = size_ + 1;
+    }
+
+    tail_ = size_ - 1;
+    data_[tail_].next_ = 0;         
+    list_is_linear_ = true;
+    capacity_       = new_capacity;
 }
 
-void ListCtor(List *list, int capacity, int line, const char *func, const char *file) {
 
-    list->capacity = capacity;
+void List::ListInform(List *list, const char* text, int line, const char *func, const char *file) {
 
-    list->data = (node *)calloc(capacity, sizeof(node));
-    Validator(list->data == nullptr, "in calloc: couldn't give memory", PrintFuncPosition(); exit(EXIT_FAILURE););
+    FILE* list_log = fopen("data//list_log.html", "a");
+    Validator(list_log == 0, in opening file, PrintFuncPosition(stderr););
+    PrintLog("<pre>\n");
+    PrintLog("-----------------------------------List Dump--------------------------------------------------\n");
 
-    list->data[0].prev = Null_Elem;
-    list->data[0].number = 0;
-    list->data[0].next = Null_Elem;
-
-    list->size = ListInitSize;
-    list->tail = Null_Node;
-    list->head = Null_Node;
-    list->data[Null_Node].next = 0;
-    list->data[Null_Node].prev = 0;
-
-    list->free_node = 1;
-    int node_number = 1;
-    for (; node_number < capacity; node_number++) {
-        list->data[node_number].prev = node_number - 1;
-        list->data[node_number].number = Free_Node;
-        list->data[node_number].next = node_number + 1;
-    }
-
-    // last elem points to itself
-    list->data[node_number - 1].next = node_number - 1;
-
-    list->list_is_linear = true;
-    list->Dump_Number = 0;
-}
-
-void ListDtor(List *list, int line, const char *func, const char *file) {
-
-    list->tail = 0;
-    list->size = 0;
-
-    for (int node_number = 1; node_number < list->capacity; node_number++) {
-        list->data[node_number].prev = 0;
-        list->data[node_number].number = 0;
-        list->data[node_number].next = 0;
-    }
-    list->capacity       = 0;
-    list->Dump_Number    = 0;
-    list->list_is_linear = 0;
-
-    free(list->data);
-    list->data = nullptr;
-}
-
-void PrintElementInfo(List *list, int elem_id) {
-
-    if (elem_id < 0 || elem_id >= list->capacity) {
-        fprintf(stderr, "" Red "error: " Grey " there is not element with such index in the list\n");
-        return;
-    }
-    Validator((elem_id < 0 || elem_id >= list->capacity), "invalid elem index"; PrintFuncPosition(); return;);
-
-    fprintf(stderr, "\t\t" Purple Blinking "Element Dump" Grin "\n");
-    fprintf(stderr, "prev index: %d\n", list->data[elem_id].prev);
-    fprintf(stderr, "index:      %d\n", elem_id);
-    fprintf(stderr, "next index: %d\n", list->data[elem_id].next);
-    fprintf(stderr, "value:      %lg\n" Grey "", list->data[elem_id].number);
-}
-
-void ListInform(List *list, int line, const char *func, const char *file) {
-
-    PrintListDump();
-    PrintFuncPosition();
-
-    fprintf(stderr, "\n");
-    fprintf(stderr, "list data ptr    =  %p\n", list->data);
-    fprintf(stderr, "list head        =  %d\n", list->head);
-    fprintf(stderr, "list tail        =  %d\n", list->tail);
-    fprintf(stderr, "list capacity    =  %d\n", list->capacity);
-    fprintf(stderr, "list size        =  %d\n", list->size);
-    fprintf(stderr, "list free node   =  %d\n\n", list->free_node);
-
-    fprintf(stderr, "list elemenst from 'head' to 'tail' in order:\n");
-    PrintBlueLine()
-
-        int data_num = 1;
-    int elem_id = list->head;
-
-    for (; data_num < list->size; data_num++, elem_id = list->data[elem_id].next) {
-        fprintf(stderr, "[%d] = %lg\n", data_num, list->data[elem_id].number);
-    }
-
-    fprintf(stderr, "*[%d] = %lg <------ End of list\n", data_num, list->data[elem_id].number);
-    PrintBlueLine()
-
-        fprintf(stderr, "list elemenst from 'tail' to 'head' in order:\n");
-
-    data_num = 1;
-    elem_id = list->tail;
-
-    for (; data_num < list->size; data_num++, elem_id = list->data[elem_id].prev) {
-        fprintf(stderr, "[%d] = %lg\n", data_num, list->data[elem_id].number);
-    }
-
-    fprintf(stderr, "*[%d] = %lg <------ End of list\n", data_num, list->data[elem_id].number);
-    PrintListDumpEnd();
+    PrintFuncPosition(list_log);
+    PrintLog("head:%d,\ttail:%d,\tfree node:%d;\ncapacity:%d,\tsize:%d\n", head_, tail_, \
+    free_node_, capacity_, size_);
+    PrintLog("Action with list: %s", text);
 
     ListGraph(list);
+    PrintLog("<img src=\"../data/graph_%d.png\" width = \"2000px\" height = \"400px\">\n", Dump_Number_);
+    PrintLog("---------------------------------------End----------------------------------------------\n\n");
+
+    Dump_Number_++;
+
+    char is_file_closed = fclose(list_log);
+    Validator(is_file_closed != 0, in closing file, PrintFuncPosition(stderr););
 }
 
-void ListGraph(List *list) {
+int List::ListGraph(List *list) {
 
-    char file_name[100] = "list.dot0";
-    // sprintf(file_name, "list.dot%d", list->Dump_Number);
-    FILE *dot_file = fopen(file_name, "w+");
-    printf("dot_file = %d\n", dot_file == nullptr);
+    DotStartGraph("data//list.dot");
+    Validator(dot_file == nullptr, in opening file:'data//list.dot', return OPEN_FILE_ERROR;);
 
     const char dot_header[] = "digraph List {\n"
                               "\tdpi = 100;\n"
                               "\tfontname = \"Comic Sans MS\";\n"
                               "\tfontsize = 20;\n"
-                              "\trankdir   =  LR;\n"
-                              "\tedge [color = darkgrey, arrowhead = onormal, arrowsize = 1, penwidth = 1.2]\n"
-                              "\tgraph[fillcolor = lightgreen, ranksep = 1.3, nodesep = 0.5,"
-                              "style = \"rounded, filled\",color = green, penwidth = 2]\n\n";
-
+                              "\trankdir  = LR;\n";
     PrintDot(dot_header);
 
+    DotSetGraph("lightgreen", 1.3, 0.5, "rounded", "green", 2.);
+    DotSetEdge("darkgrey", "onormal", 1., 1.2);
+
     // General list information
-    PrintDot("List_Inform [shape = record, color = purple, style = solid, label = \"free:%d | size:%d | capacity: %d\"]\n\n",
-             list->free_node, list->size, list->capacity);
+    PrintDot("List_Inform [shape = record, color = yellow, style = solid, label = \"linear:%s | free:%d | size:%d | capacity: %d\"]\n\n",\
+            list_is_linear_ == true? "true":"false", free_node_, size_, capacity_);
 
     PrintDot("node%d [shape = record, color = brown, style = solid, label = \"node_id:%d|<p> prev:%d| value:%d|<n>next:%d\"]\n",
              0, 0, Null_Node, Null_Elem, Null_Node);
-    // PrintDot("Nothing -> node%d\n", Null_Node);
 
-    for (int phys_node_id = 1; phys_node_id < list->capacity; phys_node_id++)
+    for (int phys_node_id = 1; phys_node_id < capacity_; phys_node_id++)
     {
 
-        if (phys_node_id == list->head)
+        if (phys_node_id == head_)
         {
             PrintDot("node%d [shape = record, color = red, style = solid, label = \"node_id:%d|<p> prev:%d| value:%lg|<n>next:%d\"]\n",
-                     phys_node_id, phys_node_id, list->data[phys_node_id].prev, list->data[phys_node_id].number, list->data[phys_node_id].next);
-            // PrintDot("Head -> node%d\n", phys_node_id);
+                     phys_node_id, phys_node_id, data_[phys_node_id].prev_, data_[phys_node_id].number_, data_[phys_node_id].next_);
         }
-        if (phys_node_id == list->tail)
+        if (phys_node_id == tail_)
         {
             PrintDot("node%d [shape = record, color = red, style = solid, label = \"node_id:%d|<p> prev:%d| value:%lg|<n>next:%d\"]\n",
-                     phys_node_id, phys_node_id, list->data[phys_node_id].prev, list->data[phys_node_id].number, list->data[phys_node_id].next);
-            // PrintDot("Tail -> node%d\n", phys_node_id);
+                     phys_node_id, phys_node_id, data_[phys_node_id].prev_, data_[phys_node_id].number_, data_[phys_node_id].next_);
         }
-        if (phys_node_id != list->head && phys_node_id != list->tail)
+        if (phys_node_id != head_ && phys_node_id != tail_)
         {
-            PrintDot("node%d [shape = record, color = green, style = solid, label = \"node_id:%d|<p> prev:%d| value:%lg|<n>next:%d\"]\n",
-                     phys_node_id, phys_node_id, list->data[phys_node_id].prev, list->data[phys_node_id].number, list->data[phys_node_id].next);
+            PrintDot("node%d [shape = record, color = %s, style = solid, label = \"node_id:%d|<p> prev:%d| value:%lg|<n>next:%d\"]\n",\
+                     phys_node_id, data_[phys_node_id].number_ == Free_Node ? "purple":"green", phys_node_id, data_[phys_node_id].prev_,\
+                     data_[phys_node_id].number_, data_[phys_node_id].next_);
         }
     }
     PrintDot("\n\n\n");
 
     // making invisible connections
-    int node_ptr = list->head;
+    int node_ptr = head_;
     PrintDot("edge[style=invis, constraint = true]")
-        PrintDot("node%d ", Null_Node);
-    for (int i = 1; i < list->size; i++, node_ptr = list->data[node_ptr].next) {
+    PrintDot("node%d ", Null_Node);
+    for (int i = 1; i < size_; i++, node_ptr = data_[node_ptr].next_) {
         PrintDot("-> node%d ", node_ptr);
     }
 
-    node_ptr = list->free_node;
+    node_ptr = free_node_;
     PrintDot("-> node%d ", node_ptr);
-    node_ptr = list->data[node_ptr].next;
-    for (int i = list->size; i < list->capacity; i++, node_ptr = list->data[node_ptr].next) {
+    node_ptr = data_[node_ptr].next_;
+    for (int i = size_; i < capacity_; i++, node_ptr = data_[node_ptr].next_) {
         PrintDot("-> node%d ", node_ptr);
     }
-    // PrintDot("Head -> Tail -> Free_Node -> Null\n")
-    PrintDot("\nHead -> node%d\n", list->head);
-    PrintDot("Tail -> node%d\n", list->tail);
-    PrintDot("Free_Node -> node%d\n", list->free_node);
+    PrintDot("\nHead -> node%d\n", head_);
+    PrintDot("Tail -> node%d\n", tail_);
+    PrintDot("Free_Node -> node%d\n", free_node_);
     PrintDot("Null -> node%d\n", Null_Node);
+    
     // making visible connections
-
     PrintDot("edge[style=solid, constraint = false]")
-    PrintDot("node%d:p -> node%d;", list->head, Null_Elem);
-    PrintDot("node%d:n ", list->head);
+    PrintDot("node%d:p -> node%d;", head_, Null_Elem);
+    PrintDot("node%d:n ", head_);
 
-    int node_id = list->head;
+    int node_id = head_;
     int prev_id = node_id;
-    node_id = list->data[node_id].next;
+    node_id = data_[node_id].next_;
     int phys_node_id = 1;
-    for ( ; phys_node_id < list->size; phys_node_id++, node_id = list->data[node_id].next) {
+    for ( ; phys_node_id < size_; phys_node_id++, node_id = data_[node_id].next_) {
         if (node_id == 0) {
             break;
         }
@@ -556,12 +479,12 @@ void ListGraph(List *list) {
     }
     PrintDot(" -> node%d\n", node_id);
 
-    node_id = list->free_node;
+    node_id = free_node_;
     prev_id = node_id;
     PrintDot("node%d:n ", node_id);
-    node_id = list->data[node_id].next;
-    for ( ; phys_node_id < list->capacity - 2; phys_node_id++, node_id = list->data[node_id].next) {
-        if (node_id == list->capacity) {
+    node_id = data_[node_id].next_;
+    for ( ; phys_node_id < capacity_ - 2; phys_node_id++, node_id = data_[node_id].next_) {
+        if (node_id == capacity_) {
             break;
         }
         PrintDot("-> node%d ", node_id);
@@ -572,27 +495,37 @@ void ListGraph(List *list) {
     }
     PrintDot(" -> node%d\n", node_id);
 
-    // PrintDot("\n{rank = same; \"Head\"; \"Tail\"; \"Free\"; \"Null\";}\n");
-    // PrintDot("{rank = same; \"Head\"; node%d}\n", list->head);
-    // PrintDot("{rank = same; \"Tail\"; node%d}\n", list->tail);
-    // PrintDot("{rank = same; \"Free\"; node%d}\n", list->free_node);
-    // PrintDot("{rank = same; \"Null\"; node%d}\n", Null_Node);
-    PrintDot("Head -> node%d\n", list->head);
-    PrintDot("Tail -> node%d\n", list->tail);
-    PrintDot("Free_Node -> node%d\n", list->free_node);
+    PrintDot("Head -> node%d\n", head_);
+    PrintDot("Tail -> node%d\n", tail_);
+    PrintDot("Free_Node -> node%d\n", free_node_);
     PrintDot("Null -> node%d\n", Null_Node);
-    PrintDot("}\n");
 
+    DotEndGraph(dot_file);
+    DotPrintGraph(file, Dump_Number_);
 
-    char dot_png[Max_Dot_Command_Len + 100] = "";
-
-    sprintf(dot_png, "dot -Tpng %s -o graph_%d.png", file_name, list->Dump_Number);
-    // sprintf(dot_png, "dot -Tpng  -O %s", file_name);
-
-    printf("DOT = %s\n", dot_png);
-    printf("system = %d\n", system(dot_png));
-
-    list->Dump_Number++;
-
-    fclose(dot_file);
+    return Dump_Number_;
+}
+elem_t List::GetValue(int id) {
+    return data_[id].number_;
+}
+int List::GetSize() {
+    return size_;
+}
+int List::GetCap() {
+    return capacity_;
+}
+int List::GetTail() {
+    return tail_;
+}
+int List::GetHead() {
+    return head_;
+}
+int List::GetFree() {
+    return free_node_;
+}
+int List::GetLinear() {
+    return list_is_linear_;
+}
+int List::GetDumpNum() {
+    return Dump_Number_;
 }
