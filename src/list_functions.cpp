@@ -223,7 +223,7 @@ void ClearList(List *list) {
 void DeleteNode(List *list, int node_id) {
 
     int right_neighbour = list->data[node_id].next;
-    int left_neighbour = list->data[node_id].prev;
+    int left_neighbour  = list->data[node_id].prev;
     list->data[node_id].number = Free_Node;
 
     AddFreeNodeAfterDelete(list, node_id);
@@ -324,7 +324,7 @@ List ListResize(List *list, int new_capacity) { //1 argument, increase size by c
 
     if (new_capacity < list->size) {
         fprintf(stderr, "" White "%s:%d:" Purple "Warning:" Grey "good job, fucker: you just could erased some list's data but I saved "
-        "your black ass \n", __PRETTY_FUNCTION__, __LINE__);
+        "your black ass nigga\n", __PRETTY_FUNCTION__, __LINE__);
         return *list;
     }
     node* new_data = (node*) calloc(new_capacity, sizeof(node));
@@ -401,7 +401,6 @@ void ListCtor(List *list, int capacity, int line, const char *func, const char *
         list->data[node_number].number = Free_Node;
         list->data[node_number].next = node_number + 1;
     }
-
     // last elem points to itself
     list->data[node_number - 1].next = node_number - 1;
 
