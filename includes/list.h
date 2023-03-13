@@ -37,7 +37,9 @@ enum ListErrors {
 } ;
 
 class List {
+
 public:
+
     List(int capacity) {
 
     if (capacity <= 0) {
@@ -64,7 +66,6 @@ public:
         data_[node_number].next_   = node_number + 1;
     }
 
-    // last elem points to itself
     data_[node_number - 1].next_ = node_number - 1;
     list_is_linear_ = true;
     Dump_Number_    = 0;
@@ -72,18 +73,41 @@ public:
     
     List(const List &list) {
         
-        data_ = new node[capacity_]; 
-        size_ = list.size_;
         capacity_ = list.capacity_;
+        data_     = new node[capacity_]; 
+
+        Dump_Number_    = list.Dump_Number_;
+        list_is_linear_ = list.list_is_linear_;
+        free_node_      = list.free_node_;
+        size_ = list.size_;
         head_ = list.head_;
         tail_ = list.tail_;
-        free_node_ = list.free_node_;
-        list_is_linear_ = list.list_is_linear_;
-        Dump_Number_    = list.Dump_Number_;
+
+        for (int node_number = 0; node_number < capacity_; node_number++) {
+            data_[node_number].prev_   = list.data_[node_number].prev_;
+            data_[node_number].number_ = list.data_[node_number].number_;
+            data_[node_number].next_   = list.data_[node_number].next_;
+        }
     }
 
-    List operator = (const List &list) {
+    List& operator = (const List &list) {
+        delete[] this->data_;
+        capacity_ = list.capacity_;
+        data_     = new node[capacity_]; 
 
+        Dump_Number_    = list.Dump_Number_;
+        list_is_linear_ = list.list_is_linear_;
+        free_node_      = list.free_node_;
+        size_ = list.size_;
+        head_ = list.head_;
+        tail_ = list.tail_;
+        for (int node_number = 0; node_number < capacity_; node_number++) {
+            data_[node_number].prev_   = list.data_[node_number].prev_;
+            data_[node_number].number_ = list.data_[node_number].number_;
+            data_[node_number].next_   = list.data_[node_number].next_;
+        }
+
+        return *this;
     }
 
     void ListInform(List* list, const char* text, int line, const char* func, const char* file);
@@ -117,8 +141,8 @@ public:
     ~List() {
         delete[] data_;
     }
-private:
 
+private:
     class node {
     public:
         elem_t number_;

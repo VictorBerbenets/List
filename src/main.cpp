@@ -55,5 +55,13 @@ int main() {
     list.ListLinearize(&list);
     ListDump(list, "list linearizing\n");
 
+    List list2(5);
+
+    list2 = list; 
+
+    list2.ListPushHead(&list2, -100);
+    ListDump(list2, "Pushing %lg to head\n", list2.GetValue(list2.GetHead()));
+
+
     return 0;
 }
